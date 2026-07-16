@@ -1,12 +1,12 @@
 import { motion } from 'framer-motion'
 
-// ── Replace this URL to swap the place image ──────────────────────────────
-const PLACE_IMAGE =
-  'https://images.pexels.com/photos/6830394/pexels-photo-6830394.jpeg?auto=compress&cs=tinysrgb&w=1200&h=900&fit=crop'
+// ── Replace this URL to swap the menu section image ────────────────────────
+const MENU_IMAGE =
+  'https://images.pexels.com/photos/1813467/pexels-photo-1813467.jpeg?auto=compress&cs=tinysrgb&w=1200&h=900&fit=crop'
 
-export default function CatchABreak({ onBook }: { onBook: () => void }) {
+export default function ViewMenuCTA({ onViewMenu }: { onViewMenu: () => void }) {
   return (
-    <section id="catch-a-break" className="py-20 sm:py-32 bg-stone-50 overflow-hidden">
+    <section id="view-menu-cta" className="py-20 sm:py-32 bg-stone-50 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex flex-col lg:flex-row items-center gap-10 lg:gap-16">
           {/* Image — left on desktop, full-width on mobile */}
@@ -22,8 +22,8 @@ export default function CatchABreak({ onBook }: { onBook: () => void }) {
               style={{ border: '2px solid rgba(74,103,65,0.15)' }}
             >
               <motion.img
-                src={PLACE_IMAGE}
-                alt="Modern café beside padel courts"
+                src={MENU_IMAGE}
+                alt="Café food and drinks"
                 className="w-full h-full object-cover"
                 initial={{ scale: 1.15 }}
                 whileInView={{ scale: 1 }}
@@ -40,26 +40,16 @@ export default function CatchABreak({ onBook }: { onBook: () => void }) {
             </div>
           </motion.div>
 
-          {/* Text content — right on desktop, below image on mobile */}
+          {/* Text content */}
           <div className="w-full lg:w-[40%] flex flex-col justify-center lg:py-8">
-            <motion.p
-              className="text-sm font-semibold text-olive-600 tracking-[0.3em] uppercase mb-4"
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.3 }}
-              transition={{ duration: 0.6, ease: 'easeOut' }}
-            >
-              CAFE + PADEL
-            </motion.p>
-
             <motion.h2
               className="text-4xl sm:text-5xl lg:text-6xl font-bold text-stone-800 leading-tight mb-6"
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.3 }}
-              transition={{ duration: 0.6, ease: 'easeOut', delay: 0.12 }}
+              transition={{ duration: 0.6, ease: 'easeOut' }}
             >
-              CATCH A BREAK
+              VIEW OUR MENU
             </motion.h2>
 
             <motion.p
@@ -67,25 +57,24 @@ export default function CatchABreak({ onBook }: { onBook: () => void }) {
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.3 }}
-              transition={{ duration: 0.6, ease: 'easeOut', delay: 0.24 }}
+              transition={{ duration: 0.6, ease: 'easeOut', delay: 0.12 }}
             >
-              From your first coffee of the day to your final match, we've got you
-              covered. Relax, enjoy fresh food and drinks, and spend time with
-              friends before or after your game.
+              Whether you're looking to refuel between games or relax before or
+              after your match, our menu has something for everyone.
             </motion.p>
 
             <motion.div
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.3 }}
-              transition={{ duration: 0.6, ease: 'easeOut', delay: 0.36 }}
+              transition={{ duration: 0.6, ease: 'easeOut', delay: 0.24 }}
             >
               <button
-                onClick={onBook}
+                onClick={onViewMenu}
                 className="inline-flex items-center gap-2 bg-olive-600 hover:bg-olive-700 text-white font-semibold px-8 py-3.5 rounded-full shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 active:scale-95"
                 style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
               >
-                BOOK A COURT
+                VIEW MENU
               </button>
             </motion.div>
           </div>

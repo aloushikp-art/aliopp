@@ -3,10 +3,13 @@ import Background from './components/Background';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import Menu from './components/Menu';
-import Gallery from './components/Gallery';
 import Footer from './components/Footer';
 import IntroAnimation from './components/IntroAnimation';
 import CatchABreak from './components/CatchABreak';
+import EditorialGallery from './components/EditorialGallery';
+import ViewMenuCTA from './components/ViewMenuCTA';
+import ContactSection from './components/ContactSection';
+import SiteFooter from './components/SiteFooter';
 import WhatsAppButton from './components/WhatsAppButton';
 
 type Route = 'home' | 'menu';
@@ -60,11 +63,17 @@ export default function App() {
             <>
               <Hero onViewMenu={() => navigate('menu')} />
               <CatchABreak onBook={scrollToBooking} />
-              <Gallery />
+              <EditorialGallery />
+              <ViewMenuCTA onViewMenu={() => navigate('menu')} />
+              <ContactSection />
             </>
           )}
         </main>
-        <Footer navigate={navigate} />
+        {route === 'menu' ? (
+          <Footer navigate={navigate} />
+        ) : (
+          <SiteFooter navigate={navigate} onBook={scrollToBooking} />
+        )}
         <WhatsAppButton />
       </div>
     </>

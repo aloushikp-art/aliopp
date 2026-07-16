@@ -1,9 +1,7 @@
 import { motion } from 'framer-motion'
 
-// ── Change these two values to update WhatsApp ────────────────────────────
-// 1. WhatsApp number (international format, no + or spaces)
+// ── WhatsApp config — change these two values to update ───────────────────
 export const WHATSAPP_NUMBER = '961XXXXXXXX'
-// 2. Pre-filled message (URL-encoded)
 export const WHATSAPP_MESSAGE =
   'Hello, I would like to ask about the café and padel court.'
 
