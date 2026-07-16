@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react'
 import { motion } from 'framer-motion'
 
-type SectionId = 'food' | 'hot' | 'cold' | 'dessert' | 'shisha'
+type SectionId = 'hot' | 'cold' | 'dessert' | 'shisha'
 
 interface MenuItem {
   name: string
@@ -22,27 +22,6 @@ interface Section {
 }
 
 const SECTIONS: Section[] = [
-  {
-    id: 'food',
-    label: 'Food',
-    icon: '🍔',
-    gradient: 'linear-gradient(135deg,#f97316,#ea580c)',
-    border: '#c2410c',
-    textColor: '#c2410c',
-    glowColor: 'rgba(249,115,22,0.4)',
-    items: [
-      { name: 'Club Sandwich', price: '$9', desc: 'Triple-decker with fries' },
-      { name: 'Caesar Salad', price: '$8', desc: 'Crisp romaine, parmesan' },
-      { name: 'Margherita Pizza', price: '$12', desc: 'Basil, mozzarella, tomato' },
-      { name: 'Beef Burger', price: '$11', desc: 'Juicy patty, cheddar, pickles' },
-    ],
-    parts: [
-      { ch: '✨', c: 'pa1', x: '10%', y: '16%' },
-      { ch: '🌟', c: 'pa3', x: '40%', y: '10%' },
-      { ch: '✨', c: 'pa2', x: '66%', y: '18%' },
-      { ch: '⭐', c: 'pa4', x: '84%', y: '13%' },
-    ],
-  },
   {
     id: 'hot',
     label: 'Hot Drinks',
@@ -130,7 +109,7 @@ const SECTIONS: Section[] = [
 export default function Menu({ onBack }: { onBack?: () => void }) {
   const [hovered, setHovered] = useState<SectionId | null>(null)
   const sectionRefs = useRef<Record<SectionId, HTMLDivElement | null>>({
-    food: null, hot: null, cold: null, dessert: null, shisha: null,
+    hot: null, cold: null, dessert: null, shisha: null,
   })
 
   const scrollToSection = (id: SectionId) => {
