@@ -174,20 +174,6 @@ export default function Menu({ onBack }: { onBack?: () => void }) {
                   <span className="smoke s5" />
                 </span>
               )}
-              {sec.id === 'hot' && (
-                <span className="espresso-machine" aria-hidden="true">
-                  <span className="em-machine">
-                    <span className="em-body" />
-                    <span className="em-top" />
-                    <span className="em-spout" />
-                    <span className="em-stream" />
-                    <span className="em-cup" />
-                    <span className="em-steam st-1" />
-                    <span className="em-steam st-2" />
-                    <span className="em-steam st-3" />
-                  </span>
-                </span>
-              )}
               <span style={{
                 fontSize: '1.8rem',
                 lineHeight: 1,
