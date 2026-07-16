@@ -11,12 +11,15 @@ import ViewMenuCTA from './components/ViewMenuCTA';
 import ContactSection from './components/ContactSection';
 import SiteFooter from './components/SiteFooter';
 import WhatsAppButton from './components/WhatsAppButton';
+import ColdDrinksPage from './components/ColdDrinksPage';
 
-type Route = 'home' | 'menu';
+type Route = 'home' | 'menu' | 'cold-drinks';
 
 function parseRoute(): Route {
   const hash = window.location.hash.replace(/^#/, '');
-  return hash === '/menu' ? 'menu' : 'home';
+  if (hash === '/menu') return 'menu';
+  if (hash === '/menu/cold-drinks') return 'cold-drinks';
+  return 'home';
 }
 
 export default function App() {
@@ -37,7 +40,9 @@ export default function App() {
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
-    window.location.hash = to === 'menu' ? '/menu' : '/';
+    if (to === 'menu') window.location.hash = '/menu';
+    else if (to === 'cold-drinks') window.location.hash = '/menu/cold-drinks';
+    else window.location.hash = '/';
   };
 
   const scrollToBooking = () => {
@@ -55,10 +60,12 @@ export default function App() {
       {showIntro && <IntroAnimation onComplete={() => setShowIntro(false)} />}
       <div className="relative min-h-screen bg-stone-100">
         <Background />
-        <Navbar navigate={navigate} route={route} />
+        {route !== 'cold-drinks' && <Navbar navigate={navigate} route={route} />}
         <main className="relative z-10">
           {route === 'menu' ? (
-            <Menu onBack={() => navigate('home')} />
+            <Menu onBack={() => navigate('home')} onColdDrinks={() => navigate('cold-drinks')} />
+          ) : route === 'cold-drinks' ? (
+            <ColdDrinksPage navigate={navigate} />
           ) : (
             <>
               <Hero onViewMenu={() => navigate('menu')} />
@@ -70,6 +77,8 @@ export default function App() {
           )}
         </main>
         {route === 'menu' ? (
+          <Footer navigate={navigate} />
+        ) : route === 'cold-drinks' ? (
           <Footer navigate={navigate} />
         ) : (
           <SiteFooter navigate={navigate} onBook={scrollToBooking} />
