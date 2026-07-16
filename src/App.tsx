@@ -6,6 +6,8 @@ import Menu from './components/Menu';
 import Gallery from './components/Gallery';
 import Footer from './components/Footer';
 import IntroAnimation from './components/IntroAnimation';
+import CatchABreak from './components/CatchABreak';
+import WhatsAppButton from './components/WhatsAppButton';
 
 type Route = 'home' | 'menu';
 
@@ -35,6 +37,16 @@ export default function App() {
     window.location.hash = to === 'menu' ? '/menu' : '/';
   };
 
+  const scrollToBooking = () => {
+    const el = document.getElementById('booking');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      const contact = document.getElementById('contact');
+      if (contact) contact.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <>
       {showIntro && <IntroAnimation onComplete={() => setShowIntro(false)} />}
@@ -47,11 +59,13 @@ export default function App() {
           ) : (
             <>
               <Hero onViewMenu={() => navigate('menu')} />
+              <CatchABreak onBook={scrollToBooking} />
               <Gallery />
             </>
           )}
         </main>
         <Footer navigate={navigate} />
+        <WhatsAppButton />
       </div>
     </>
   );
