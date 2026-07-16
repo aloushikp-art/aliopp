@@ -86,7 +86,7 @@ const SECTIONS: Section[] = [
   },
   {
     id: 'shisha',
-    label: 'Shisha',
+    label: '2aragile',
     icon: '💨',
     gradient: 'linear-gradient(135deg,#84cc16,#65a30d)',
     border: '#4d7c0f',
@@ -209,6 +209,12 @@ export default function Menu({ onBack }: { onBack?: () => void }) {
                   <img
                     src="/hot-drinks.png"
                     alt="Hot Drinks"
+                    style={{ width: '46px', height: '46px', objectFit: 'contain' }}
+                  />
+                ) : sec.id === 'shisha' ? (
+                  <img
+                    src="/aragile.png"
+                    alt="2aragile"
                     style={{ width: '46px', height: '46px', objectFit: 'contain' }}
                   />
                 ) : (
