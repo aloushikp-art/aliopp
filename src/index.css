@@ -77,3 +77,49 @@ body { font-family:system-ui,-apple-system,sans-serif; background-color:#f5f5f4;
 .psk1 { position:absolute; pointer-events:none; animation:sk1 3.5s ease-out infinite; font-size:20px; }
 .psk2 { position:absolute; pointer-events:none; animation:sk1 3.5s ease-out infinite; font-size:16px; animation-delay:1.2s; }
 .psk3 { position:absolute; pointer-events:none; animation:sk1 4s ease-out infinite; font-size:18px; animation-delay:2.3s; }
+
+/* Real smoke effect for 2aragile button */
+.smoke-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 1;
+}
+.smoke {
+  position: absolute;
+  bottom: -10px;
+  left: 15%;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,0.5) 0%, rgba(200,200,200,0.25) 50%, transparent 80%);
+  filter: blur(4px);
+  opacity: 0;
+}
+.smoke.s1 { animation: smoke-rise 3s ease-out infinite; animation-delay: 0s; left: 12%; }
+.smoke.s2 { animation: smoke-rise 3.5s ease-out infinite; animation-delay: 0.6s; left: 20%; }
+.smoke.s3 { animation: smoke-rise 4s ease-out infinite; animation-delay: 1.2s; left: 8%; }
+.smoke.s4 { animation: smoke-rise 3.2s ease-out infinite; animation-delay: 1.8s; left: 25%; }
+.smoke.s5 { animation: smoke-rise 3.8s ease-out infinite; animation-delay: 2.4s; left: 15%; }
+
+@keyframes smoke-rise {
+  0% {
+    transform: translateY(0) translateX(0) scale(0.5);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.7;
+  }
+  50% {
+    transform: translateY(-40px) translateX(-8px) scale(1.5);
+    opacity: 0.4;
+  }
+  100% {
+    transform: translateY(-80px) translateX(-15px) scale(2.5);
+    opacity: 0;
+  }
+}

@@ -67,42 +67,33 @@ const SECTIONS: Section[] = [
     id: 'dessert',
     label: 'Dessert',
     icon: '🍰',
-    gradient: 'linear-gradient(135deg,#d4a574,#8b6f47)',
-    border: '#6b5237',
-    textColor: '#8b6f47',
-    glowColor: 'rgba(139,111,71,0.4)',
+    gradient: 'linear-gradient(135deg,#3e2723,#5d4037)',
+    border: '#3e2723',
+    textColor: '#5d4037',
+    glowColor: 'rgba(93,64,55,0.4)',
     items: [
       { name: 'Chocolate Lava Cake', price: '$6', desc: 'Warm center, vanilla ice cream' },
       { name: 'Tiramisu', price: '$5.5', desc: 'Coffee-soaked layers, mascarpone' },
       { name: 'Cheesecake', price: '$5', desc: 'New York style, berry compote' },
       { name: 'Milk Pudding', price: '$4', desc: 'Silky smooth, caramel topping' },
     ],
-    parts: [
-      { ch: '✨', c: 'pa1', x: '10%', y: '18%' },
-      { ch: '💖', c: 'pa2', x: '32%', y: '12%' },
-      { ch: '⭐', c: 'pa3', x: '62%', y: '18%' },
-      { ch: '✨', c: 'pa4', x: '82%', y: '14%' },
-    ],
+    parts: [],
   },
   {
     id: 'shisha',
     label: '2aragile',
     icon: '💨',
-    gradient: 'linear-gradient(135deg,#84cc16,#65a30d)',
-    border: '#4d7c0f',
-    textColor: '#65a30d',
-    glowColor: 'rgba(132,204,22,0.4)',
+    gradient: 'linear-gradient(135deg,#facc15,#eab308)',
+    border: '#a16207',
+    textColor: '#ca8a04',
+    glowColor: 'rgba(250,204,21,0.4)',
     items: [
       { name: 'Mint Breeze', price: '$12', desc: 'Cool refreshing mint' },
       { name: 'Double Apple', price: '$12', desc: 'Classic sweet apple blend' },
       { name: 'Blue Mist', price: '$13', desc: 'Blueberry with a icy finish' },
       { name: 'Watermelon Wave', price: '$13', desc: 'Juicy watermelon, light & sweet' },
     ],
-    parts: [
-      { ch: '💨', c: 'psk1', x: '14%', y: '16%' },
-      { ch: '💨', c: 'psk2', x: '46%', y: '10%' },
-      { ch: '💨', c: 'psk3', x: '72%', y: '18%' },
-    ],
+    parts: [],
   },
 ]
 
@@ -183,6 +174,15 @@ export default function Menu({ onBack }: { onBack?: () => void }) {
                   {p.ch}
                 </span>
               ))}
+              {sec.id === 'shisha' && (
+                <span className="smoke-container" aria-hidden="true">
+                  <span className="smoke s1" />
+                  <span className="smoke s2" />
+                  <span className="smoke s3" />
+                  <span className="smoke s4" />
+                  <span className="smoke s5" />
+                </span>
+              )}
               <span style={{
                 fontSize: '1.8rem',
                 lineHeight: 1,
@@ -223,7 +223,8 @@ export default function Menu({ onBack }: { onBack?: () => void }) {
               </span>
               <span style={{
                 fontSize: '0.72rem',
-                fontWeight: 800,
+                fontWeight: 700,
+                fontFamily: "'Merriweather', serif",
                 color: '#fff',
                 letterSpacing: '1px',
                 textShadow: `0 0 14px ${sec.glowColor}`,
