@@ -36,11 +36,7 @@ const SECTIONS: Section[] = [
       { name: 'Latte', price: '$4.5', desc: 'Smooth espresso with steamed milk' },
       { name: 'Turkish Coffee', price: '$3.5', desc: 'Traditional, bold & aromatic' },
     ],
-    parts: [
-      { ch: '♨️', c: 'pst1', x: '18%', y: '16%' },
-      { ch: '♨️', c: 'pst2', x: '48%', y: '12%' },
-      { ch: '♨️', c: 'pst3', x: '74%', y: '18%' },
-    ],
+    parts: [],
   },
   {
     id: 'cold',
@@ -56,12 +52,7 @@ const SECTIONS: Section[] = [
       { name: 'Mango Smoothie', price: '$5.5', desc: 'Fresh mango, yogurt, honey' },
       { name: 'Iced Tea', price: '$3.5', desc: 'Lemon or peach, refreshing' },
     ],
-    parts: [
-      { ch: '❄️', c: 'pa1', x: '10%', y: '16%' },
-      { ch: '💧', c: 'pa2', x: '30%', y: '12%' },
-      { ch: '🫧', c: 'pa3', x: '60%', y: '18%' },
-      { ch: '❄️', c: 'pa4', x: '80%', y: '10%' },
-    ],
+    parts: [],
   },
   {
     id: 'dessert',
@@ -183,6 +174,20 @@ export default function Menu({ onBack }: { onBack?: () => void }) {
                   <span className="smoke s5" />
                 </span>
               )}
+              {sec.id === 'hot' && (
+                <span className="espresso-machine" aria-hidden="true">
+                  <span className="em-machine">
+                    <span className="em-body" />
+                    <span className="em-top" />
+                    <span className="em-spout" />
+                    <span className="em-stream" />
+                    <span className="em-cup" />
+                    <span className="em-steam st-1" />
+                    <span className="em-steam st-2" />
+                    <span className="em-steam st-3" />
+                  </span>
+                </span>
+              )}
               <span style={{
                 fontSize: '1.8rem',
                 lineHeight: 1,
@@ -224,7 +229,7 @@ export default function Menu({ onBack }: { onBack?: () => void }) {
               <span style={{
                 fontSize: '0.72rem',
                 fontWeight: 700,
-                fontFamily: "'Merriweather', serif",
+                fontFamily: "'Cormorant Garamond', 'Playfair Display', serif",
                 color: '#fff',
                 letterSpacing: '1px',
                 textShadow: `0 0 14px ${sec.glowColor}`,
