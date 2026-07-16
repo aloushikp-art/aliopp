@@ -55,17 +55,25 @@ export default function App() {
     }
   };
 
+  // Cold Drinks gets a fully isolated full-screen layout — no footer, no background
+  if (route === 'cold-drinks') {
+    return (
+      <>
+        <ColdDrinksPage navigate={navigate} />
+        <WhatsAppButton />
+      </>
+    );
+  }
+
   return (
     <>
       {showIntro && <IntroAnimation onComplete={() => setShowIntro(false)} />}
       <div className="relative min-h-screen bg-stone-100">
         <Background />
-        {route !== 'cold-drinks' && <Navbar navigate={navigate} route={route} />}
+        <Navbar navigate={navigate} route={route} />
         <main className="relative z-10">
           {route === 'menu' ? (
             <Menu onBack={() => navigate('home')} onColdDrinks={() => navigate('cold-drinks')} />
-          ) : route === 'cold-drinks' ? (
-            <ColdDrinksPage navigate={navigate} />
           ) : (
             <>
               <Hero onViewMenu={() => navigate('menu')} />
@@ -77,8 +85,6 @@ export default function App() {
           )}
         </main>
         {route === 'menu' ? (
-          <Footer navigate={navigate} />
-        ) : route === 'cold-drinks' ? (
           <Footer navigate={navigate} />
         ) : (
           <SiteFooter navigate={navigate} onBook={scrollToBooking} />
