@@ -121,30 +121,47 @@ function ProductPanel({ dessert, dir, reducedMotion }: {
         gap: 'clamp(10px,1.8vh,18px)',
         overflow: 'hidden',
       }}>
-        {/* Product frame — oval placeholder when no image; transparent when image provided */}
-        <div className="dz-frame" style={{
-          position: 'relative', zIndex: 5,
-          width: 'min(380px, 64vw)', height: 'min(340px, 42vh)',
-          flexShrink: 0,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          ...(dessert.image ? {} : {
-            borderRadius: '50% 50% 46% 54% / 54% 48% 52% 46%',
-            background: `radial-gradient(circle at 32% 28%, ${rgba(light, 0.96)} 0%, ${rgba(dessert.themeColor, 0.94)} 60%, ${rgba(dark, 0.97)} 100%)`,
-            boxShadow: `0 40px 90px rgba(60,30,12,0.38), inset 0 8px 30px rgba(255,255,255,0.4), inset 0 -18px 40px rgba(60,30,12,0.28)`,
-            border: `1.5px solid rgba(255,255,255,0.45)`,
-            padding: '8%',
-          }),
-        }}>
+        {/* Product frame — oval placeholder when no image; full-size king when image provided */}
+        <div
+          className={dessert.image ? 'dz-frame-img' : 'dz-frame'}
+          style={{
+            position: 'relative', zIndex: 5,
+            flexShrink: 0,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            ...(dessert.image
+              ? {
+                  // KING SIZE — image dominates the panel
+                  width: 'min(540px, 80vw)',
+                  height: 'min(500px, 60vh)',
+                }
+              : {
+                  width: 'min(380px, 64vw)', height: 'min(340px, 42vh)',
+                  borderRadius: '50% 50% 46% 54% / 54% 48% 52% 46%',
+                  background: `radial-gradient(circle at 32% 28%, ${rgba(light, 0.96)} 0%, ${rgba(dessert.themeColor, 0.94)} 60%, ${rgba(dark, 0.97)} 100%)`,
+                  boxShadow: `0 40px 90px rgba(60,30,12,0.38), inset 0 8px 30px rgba(255,255,255,0.4), inset 0 -18px 40px rgba(60,30,12,0.28)`,
+                  border: `1.5px solid rgba(255,255,255,0.45)`,
+                  padding: '8%',
+                }),
+          }}
+        >
+          {/* Soft aura glow behind the image — visible depth on the cream page */}
+          {dessert.image && (
+            <div style={{
+              position: 'absolute', inset: '-8%', zIndex: 0, pointerEvents: 'none',
+              background: `radial-gradient(ellipse 75% 65% at 50% 55%, ${rgba(dessert.themeColor, 0.28)} 0%, ${rgba(light, 0.18)} 50%, transparent 75%)`,
+              filter: 'blur(28px)',
+            }} />
+          )}
           {/* Inner highlight — only shown without a real image */}
           {!dessert.image && (
             <div style={{ position: 'absolute', inset: '12%', borderRadius: '50%', background: 'radial-gradient(circle at 35% 30%, rgba(255,255,255,0.4) 0%, transparent 55%)', pointerEvents: 'none' }} />
           )}
           {/* Price badge */}
           <div style={{
-            position: 'absolute', top: dessert.image ? '-6px' : '4%', right: dessert.image ? '-6px' : '4%', zIndex: 6,
+            position: 'absolute', top: dessert.image ? '2%' : '4%', right: dessert.image ? '2%' : '4%', zIndex: 8,
             padding: 'clamp(7px,1vw,11px) clamp(12px,1.6vw,18px)',
             borderRadius: 999,
-            background: 'rgba(255,248,236,0.95)',
+            background: 'rgba(255,248,236,0.97)',
             border: `1.5px solid ${rgba(dark, 0.35)}`,
             boxShadow: '0 8px 22px rgba(60,30,12,0.28)',
             fontSize: 'clamp(15px,2vw,24px)', fontWeight: 800,
@@ -153,7 +170,13 @@ function ProductPanel({ dessert, dir, reducedMotion }: {
           }}>{dessert.price}</div>
           {dessert.image && (
             <img src={dessert.image} alt={dessert.name} draggable={false}
-              style={{ maxWidth: '100%', maxHeight: '100%', width: 'auto', height: 'auto', objectFit: 'contain', filter: 'drop-shadow(0 22px 50px rgba(40,20,8,0.48))', userSelect: 'none', position: 'relative', zIndex: 2 }} />
+              style={{
+                width: '100%', height: '100%',
+                objectFit: 'contain',
+                filter: `drop-shadow(0 28px 52px ${rgba(dessert.themeColor, 0.32)}) drop-shadow(0 8px 18px rgba(40,20,8,0.3))`,
+                userSelect: 'none', position: 'relative', zIndex: 2,
+              }}
+            />
           )}
         </div>
 
@@ -577,13 +600,15 @@ export default function DessertsPage({ navigate }: { navigate: (to: NavRoute) =>
 
       <style>{`
         @media (max-width: 720px) {
-          .dz-stage { gap: 10px !important; padding: 8px 14px !important; }
-          .dz-frame { width: 72vw !important; height: 38vh !important; padding: 10% !important; }
-          .dz-info  { padding: 12px 16px !important; }
+          .dz-stage    { gap: 10px !important; padding: 8px 14px !important; }
+          .dz-frame    { width: 72vw !important; height: 38vh !important; padding: 10% !important; }
+          .dz-frame-img{ width: 90vw !important; height: 48vh !important; }
+          .dz-info     { padding: 12px 16px !important; }
         }
         @media (max-height: 640px) and (max-width: 720px) {
-          .dz-frame { width: 68vw !important; height: 32vh !important; }
-          .dz-info  { padding: 10px 14px !important; }
+          .dz-frame    { width: 68vw !important; height: 32vh !important; }
+          .dz-frame-img{ width: 86vw !important; height: 40vh !important; }
+          .dz-info     { padding: 10px 14px !important; }
         }
       `}</style>
     </div>
