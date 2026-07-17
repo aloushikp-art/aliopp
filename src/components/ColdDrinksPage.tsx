@@ -126,6 +126,7 @@ function ProductPanel({ drink, dir, reducedMotion }: {
 function ArrowBtn({ dir, onClick, disabled }: { dir: 'left' | 'right'; onClick: () => void; disabled: boolean }) {
   return (
     <button onClick={onClick} disabled={disabled}
+      onPointerDown={e => e.stopPropagation()}
       aria-label={dir === 'left' ? 'Previous' : 'Next'}
       style={{
         position: 'absolute', top: '50%', transform: 'translateY(-50%)',
@@ -164,23 +165,19 @@ function Dots({ total, active, onDot }: { total: number; active: number; onDot: 
 function HeroView({
   idx, dir, locked, reducedMotion,
   onPrev, onNext, onDot, onShowAll,
-  onPointerDown, onPointerMove, onPointerUp, onPointerCancel,
+  onPointerDown,
 }: {
   idx: number; dir: number; locked: boolean; reducedMotion: boolean
   onPrev: () => void; onNext: () => void; onDot: (i: number) => void; onShowAll: () => void
   onPointerDown: (e: React.PointerEvent) => void
-  onPointerMove: (e: React.PointerEvent) => void
-  onPointerUp: (e: React.PointerEvent) => void
-  onPointerCancel: () => void
 }) {
   return (
     <motion.div key="hero" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       transition={{ duration: 0.5, ease: CINEMATIC }}
       style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column' }}
     >
-      <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }}
-        onPointerDown={onPointerDown} onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp} onPointerCancel={onPointerCancel}
+      <div style={{ flex: 1, position: 'relative', overflow: 'hidden', touchAction: 'pan-y' }}
+        onPointerDown={onPointerDown}
       >
         <AnimatePresence custom={dir} mode="sync">
           <ProductPanel key={idx} drink={coldDrinks[idx]} dir={dir} reducedMotion={reducedMotion} />
@@ -289,18 +286,31 @@ function AllColdDrinksView({ initialIdx, onSelect, onBack }: {
 
   const snap = useCallback((i: number) => setIdx(Math.max(0, Math.min(i, coldDrinks.length - 1))), [])
 
+  useEffect(() => {
+    const onMove = (e: PointerEvent) => {
+      if (!dragging.current) return
+      trackX.set(trackStart.current + (e.clientX - dragStartX.current))
+    }
+    const onUp = (e: PointerEvent) => {
+      if (!dragging.current) return; dragging.current = false
+      const diff = e.clientX - dragStartX.current
+      if (Math.abs(diff) > DRAG_THRESHOLD) snap(idx + (diff < 0 ? 1 : -1))
+      else animate(trackX, getTarget(idx), { type: 'spring', stiffness: 300, damping: 30 })
+    }
+    const onCancel = () => { dragging.current = false; animate(trackX, getTarget(idx), { type: 'spring', stiffness: 300, damping: 30 }) }
+    window.addEventListener('pointermove', onMove)
+    window.addEventListener('pointerup', onUp)
+    window.addEventListener('pointercancel', onCancel)
+    return () => {
+      window.removeEventListener('pointermove', onMove)
+      window.removeEventListener('pointerup', onUp)
+      window.removeEventListener('pointercancel', onCancel)
+    }
+  }, [idx, getTarget, snap, trackX])
+
   const onPD = (e: React.PointerEvent<HTMLDivElement>) => {
     dragging.current = true; dragStartX.current = e.clientX; trackStart.current = trackX.get()
-    ;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
   }
-  const onPM = (e: React.PointerEvent<HTMLDivElement>) => { if (!dragging.current) return; trackX.set(trackStart.current + (e.clientX - dragStartX.current)) }
-  const onPU = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (!dragging.current) return; dragging.current = false
-    const diff = e.clientX - dragStartX.current
-    if (Math.abs(diff) > DRAG_THRESHOLD) snap(idx + (diff < 0 ? 1 : -1))
-    else animate(trackX, getTarget(idx), { type: 'spring', stiffness: 300, damping: 30 })
-  }
-  const onPC = () => { dragging.current = false; animate(trackX, getTarget(idx), { type: 'spring', stiffness: 300, damping: 30 }) }
   const onWheel = (e: React.WheelEvent<HTMLDivElement>) => { if (Math.abs(e.deltaX) > Math.abs(e.deltaY) && Math.abs(e.deltaX) > 8) snap(idx + (e.deltaX > 0 ? 1 : -1)) }
 
   useEffect(() => {
@@ -331,7 +341,7 @@ function AllColdDrinksView({ initialIdx, onSelect, onBack }: {
       {/* Card track */}
       <div ref={containerRef}
         style={{ flex: 1, width: '100%', overflow: 'hidden', cursor: 'grab', touchAction: 'pan-y', display: 'flex', alignItems: 'center' }}
-        onPointerDown={onPD} onPointerMove={onPM} onPointerUp={onPU} onPointerCancel={onPC} onWheel={onWheel}
+        onPointerDown={onPD} onWheel={onWheel}
       >
         <motion.div style={{ x: trackX, display: 'flex', gap: GAP, userSelect: 'none' }}>
           {coldDrinks.map((drink, i) => (
@@ -363,8 +373,9 @@ export default function ColdDrinksPage({ navigate }: { navigate: (to: NavRoute) 
   const [heroIdx, setHeroIdx] = useState(0)
   const [dir, setDir] = useState(1)
   const [allInit, setAllInit] = useState(0)
+  const [locked, setLocked] = useState(false)
 
-  const locked = useRef(false)
+  const lockTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const pStartX = useRef<number | null>(null)
   const pStartY = useRef<number | null>(null)
   const isDrag = useRef(false)
@@ -375,18 +386,29 @@ export default function ColdDrinksPage({ navigate }: { navigate: (to: NavRoute) 
   const drink = coldDrinks[heroIdx]
 
   const paginate = useCallback((d: number) => {
-    if (locked.current) return
-    locked.current = true
-    setDir(d)
-    setHeroIdx(prev => (prev + d + coldDrinks.length) % coldDrinks.length)
-    setTimeout(() => { locked.current = false }, LOCK_MS)
+    setLocked(prev => {
+      if (prev) return prev
+      setDir(d)
+      setHeroIdx(p => (p + d + coldDrinks.length) % coldDrinks.length)
+      if (lockTimer.current) clearTimeout(lockTimer.current)
+      lockTimer.current = setTimeout(() => setLocked(false), LOCK_MS)
+      return true
+    })
   }, [])
 
   const goTo = useCallback((i: number) => {
-    if (locked.current || i === heroIdx) return
-    locked.current = true; setDir(i > heroIdx ? 1 : -1); setHeroIdx(i)
-    setTimeout(() => { locked.current = false }, LOCK_MS)
+    if (i === heroIdx) return
+    setLocked(prev => {
+      if (prev) return prev
+      setDir(i > heroIdx ? 1 : -1)
+      setHeroIdx(i)
+      if (lockTimer.current) clearTimeout(lockTimer.current)
+      lockTimer.current = setTimeout(() => setLocked(false), LOCK_MS)
+      return true
+    })
   }, [heroIdx])
+
+  useEffect(() => () => { if (lockTimer.current) clearTimeout(lockTimer.current) }, [])
 
   useEffect(() => {
     if (view !== 'hero') return
@@ -394,23 +416,35 @@ export default function ColdDrinksPage({ navigate }: { navigate: (to: NavRoute) 
     window.addEventListener('keydown', h); return () => window.removeEventListener('keydown', h)
   }, [view, paginate])
 
+  // Drag via window listeners — no pointer capture, so arrow clicks keep working
+  useEffect(() => {
+    if (view !== 'hero') return
+    const onMove = (e: PointerEvent) => {
+      if (pStartX.current === null) return
+      const dx = Math.abs(e.clientX - pStartX.current), dy = Math.abs(e.clientY - (pStartY.current ?? 0))
+      if (dx > dy && dx > 8) isDrag.current = true
+    }
+    const onUp = (e: PointerEvent) => {
+      if (pStartX.current === null) return
+      const diff = e.clientX - pStartX.current
+      if (isDrag.current && Math.abs(diff) > DRAG_THRESHOLD) paginate(diff < 0 ? 1 : -1)
+      pStartX.current = null; pStartY.current = null; isDrag.current = false
+    }
+    const onCancel = () => { pStartX.current = null; pStartY.current = null; isDrag.current = false }
+    window.addEventListener('pointermove', onMove)
+    window.addEventListener('pointerup', onUp)
+    window.addEventListener('pointercancel', onCancel)
+    return () => {
+      window.removeEventListener('pointermove', onMove)
+      window.removeEventListener('pointerup', onUp)
+      window.removeEventListener('pointercancel', onCancel)
+    }
+  }, [view, paginate])
+
   const onPD = useCallback((e: React.PointerEvent) => {
     if (view !== 'hero') return
     pStartX.current = e.clientX; pStartY.current = e.clientY; isDrag.current = false
-    ;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
   }, [view])
-  const onPM = useCallback((e: React.PointerEvent) => {
-    if (pStartX.current === null) return
-    const dx = Math.abs(e.clientX - pStartX.current), dy = Math.abs(e.clientY - (pStartY.current ?? 0))
-    if (dx > dy && dx > 8) isDrag.current = true
-  }, [])
-  const onPU = useCallback((e: React.PointerEvent) => {
-    if (pStartX.current === null) return
-    const diff = e.clientX - pStartX.current
-    if (isDrag.current && Math.abs(diff) > DRAG_THRESHOLD) paginate(diff < 0 ? 1 : -1)
-    pStartX.current = null; pStartY.current = null; isDrag.current = false
-  }, [paginate])
-  const onPC = useCallback(() => { pStartX.current = null; isDrag.current = false }, [])
 
   return (
     <div style={{ position: 'fixed', inset: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
@@ -448,10 +482,10 @@ export default function ColdDrinksPage({ navigate }: { navigate: (to: NavRoute) 
       <div style={{ flex: 1, position: 'relative', zIndex: 2 }}>
         <AnimatePresence mode="wait">
           {view === 'hero' ? (
-            <HeroView key="hero" idx={heroIdx} dir={dir} locked={locked.current} reducedMotion={reducedMotion.current}
+            <HeroView key="hero" idx={heroIdx} dir={dir} locked={locked} reducedMotion={reducedMotion.current}
               onPrev={() => paginate(-1)} onNext={() => paginate(1)} onDot={goTo}
               onShowAll={() => { setAllInit(heroIdx); setView('all') }}
-              onPointerDown={onPD} onPointerMove={onPM} onPointerUp={onPU} onPointerCancel={onPC}
+              onPointerDown={onPD}
             />
           ) : (
             <AllColdDrinksView key="all" initialIdx={allInit}
