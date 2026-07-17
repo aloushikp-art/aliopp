@@ -34,6 +34,7 @@ const GALLERY_IMAGES = [
     alt: 'Gourmet burger',
     span: 'col-span-1 row-span-1',
     anim: 'fade-up',
+    label: 'Padel',
   },
   {
     src: 'https://images.pexels.com/photos/708458/pexels-photo-708458.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
@@ -100,6 +101,22 @@ function GalleryItem({ item, index }: { item: typeof GALLERY_IMAGES[number]; ind
         viewport={{ once: true, amount: 0.2 }}
         transition={{ duration: 1.2, ease: [0.25, 0.1, 0.25, 1] }}
       />
+      {'label' in item && item.label && (
+        <div style={{
+          position: 'absolute', bottom: 0, left: 0, right: 0,
+          background: 'linear-gradient(to top, rgba(0,0,0,0.62) 0%, transparent 100%)',
+          padding: '18px 14px 10px',
+          display: 'flex', alignItems: 'flex-end',
+        }}>
+          <span style={{
+            color: '#fff', fontSize: '13px', fontWeight: 700,
+            letterSpacing: '0.18em', textTransform: 'uppercase',
+            textShadow: '0 1px 4px rgba(0,0,0,0.5)',
+          }}>
+            {item.label as string}
+          </span>
+        </div>
+      )}
     </motion.div>
   )
 }
