@@ -143,13 +143,15 @@ function ProductPanel({ dessert, dir, reducedMotion }: {
       <div className="dz-stage" style={{
         position: 'relative', zIndex: 4, height: '100%',
         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-        padding: 'clamp(8px,2vh,18px) clamp(20px,5vw,60px)',
-        gap: 'clamp(14px,2.4vh,26px)',
+        padding: 'clamp(6px,1.4vh,14px) clamp(16px,4vw,48px)',
+        gap: 'clamp(10px,1.8vh,18px)',
+        overflow: 'hidden',
       }}>
         {/* Rounded product frame — clean, comfortable, clearly visible */}
         <div className="dz-frame" style={{
           position: 'relative', zIndex: 5,
-          width: 'min(440px, 72vw)', height: 'min(420px, 52vh)',
+          width: 'min(380px, 64vw)', height: 'min(340px, 42vh)',
+          flexShrink: 0,
           borderRadius: '50% 50% 46% 54% / 54% 48% 52% 46%',
           background: `radial-gradient(circle at 32% 28%, ${rgba(light, 0.96)} 0%, ${rgba(dessert.themeColor, 0.94)} 60%, ${rgba(dark, 0.97)} 100%)`,
           boxShadow: `0 40px 90px rgba(60,30,12,0.38), inset 0 8px 30px rgba(255,255,255,0.4), inset 0 -18px 40px rgba(60,30,12,0.28)`,
@@ -182,19 +184,19 @@ function ProductPanel({ dessert, dir, reducedMotion }: {
         {/* Product info card — cream, rounded, centered under the frame */}
         <div className="dz-info" style={{
           position: 'relative', zIndex: 6,
-          maxWidth: 560, width: '100%',
-          padding: 'clamp(16px,2.4vw,28px) clamp(20px,3vw,36px)',
-          borderRadius: 'clamp(22px,3vw,34px)',
+          maxWidth: 520, width: '100%',
+          padding: 'clamp(12px,1.8vw,22px) clamp(18px,2.6vw,30px)',
+          borderRadius: 'clamp(20px,2.6vw,30px)',
           background: 'linear-gradient(150deg, rgba(255,248,236,0.97) 0%, rgba(255,236,224,0.95) 100%)',
           boxShadow: '0 22px 60px rgba(60,30,12,0.22), inset 0 1px 0 rgba(255,255,255,0.6)',
           border: '1px solid rgba(255,255,255,0.7)',
           textAlign: 'center',
-          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'clamp(6px,1vh,12px)',
+          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'clamp(4px,0.8vh,9px)',
         }}>
           <p style={{ margin: 0, fontSize: 'clamp(9px,1vw,11px)', fontWeight: 700, letterSpacing: '0.3em', color: rgba(dark, 0.7), textTransform: 'uppercase' }}>Desserts</p>
-          <h2 style={{ margin: 0, fontSize: 'clamp(26px,4vw,52px)', fontWeight: 800, color: dark, letterSpacing: '-0.02em', lineHeight: 1.05 }}>{dessert.name}</h2>
-          <p style={{ margin: 0, fontSize: 'clamp(13px,1.3vw,16px)', color: rgba(dark, 0.72), lineHeight: 1.55, maxWidth: 420 }}>{dessert.description}</p>
-          <p style={{ margin: 0, fontSize: 'clamp(22px,3vw,40px)', fontWeight: 800, color: dessert.themeColor, letterSpacing: '-0.01em' }}>{dessert.price}</p>
+          <h2 style={{ margin: 0, fontSize: 'clamp(22px,3.4vw,42px)', fontWeight: 800, color: dark, letterSpacing: '-0.02em', lineHeight: 1.05 }}>{dessert.name}</h2>
+          <p style={{ margin: 0, fontSize: 'clamp(12px,1.2vw,15px)', color: rgba(dark, 0.72), lineHeight: 1.5, maxWidth: 420 }}>{dessert.description}</p>
+          <p style={{ margin: 0, fontSize: 'clamp(18px,2.4vw,32px)', fontWeight: 800, color: dessert.themeColor, letterSpacing: '-0.01em' }}>{dessert.price}</p>
         </div>
       </div>
     </motion.div>
@@ -601,9 +603,13 @@ export default function DessertsPage({ navigate }: { navigate: (to: NavRoute) =>
 
       <style>{`
         @media (max-width: 720px) {
-          .dz-stage { gap: 14px !important; }
-          .dz-frame { width: 80vw !important; height: 44vh !important; padding: 10% !important; }
-          .dz-info  { padding: 14px 18px !important; }
+          .dz-stage { gap: 10px !important; padding: 8px 14px !important; }
+          .dz-frame { width: 72vw !important; height: 38vh !important; padding: 10% !important; }
+          .dz-info  { padding: 12px 16px !important; }
+        }
+        @media (max-height: 640px) and (max-width: 720px) {
+          .dz-frame { width: 68vw !important; height: 32vh !important; }
+          .dz-info  { padding: 10px 14px !important; }
         }
       `}</style>
     </div>
