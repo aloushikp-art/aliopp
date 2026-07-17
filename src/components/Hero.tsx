@@ -1,4 +1,5 @@
 import GlassyMenuButton from './GlassyMenuButton';
+import WhatsAppBookButton from './WhatsAppBookButton';
 
 export default function Hero({ onViewMenu }: { onViewMenu: () => void }) {
   return (
@@ -15,8 +16,9 @@ export default function Hero({ onViewMenu }: { onViewMenu: () => void }) {
           <p className="text-lg text-stone-500 leading-relaxed max-w-md">
             Two premium padel courts, a cozy café, a kids zone, and a giant screen. Everything you need for the perfect day out.
           </p>
-          <div className="pt-4">
+          <div className="pt-4 flex flex-col items-center" style={{ gap: '16px' }}>
             <GlassyMenuButton onClick={onViewMenu} />
+            <WhatsAppBookButton />
           </div>
         </div>
       </div>
