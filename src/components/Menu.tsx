@@ -88,7 +88,7 @@ const SECTIONS: Section[] = [
   },
 ]
 
-export default function Menu({ onBack, onHotDrinks, onColdDrinks, onDesserts }: { onBack?: () => void; onHotDrinks?: () => void; onColdDrinks?: () => void; onDesserts?: () => void }) {
+export default function Menu({ onBack, onHotDrinks, onColdDrinks, onDesserts, onShisha }: { onBack?: () => void; onHotDrinks?: () => void; onColdDrinks?: () => void; onDesserts?: () => void; onShisha?: () => void }) {
   const [hovered, setHovered] = useState<SectionId | null>(null)
   const sectionRefs = useRef<Record<SectionId, HTMLDivElement | null>>({
     hot: null, cold: null, dessert: null, shisha: null,
@@ -105,6 +105,10 @@ export default function Menu({ onBack, onHotDrinks, onColdDrinks, onDesserts }: 
     }
     if (id === 'dessert' && onDesserts) {
       onDesserts()
+      return
+    }
+    if (id === 'shisha' && onShisha) {
+      onShisha()
       return
     }
     const el = sectionRefs.current[id]
