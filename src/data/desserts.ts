@@ -3,14 +3,15 @@
 //  Edit ONLY this array to update products on the page.
 //
 //  • name         full product name (shown in hero headline and cards)
-//  • shortName    short keyword for the giant background text
+//  • shortName    short keyword for the curved background text
 //  • description  one-line tagline
 //  • price        price string  e.g. "$3"
 //  • image        null = shows placeholder; replace with "/your-image.png" or URL
 //  • themeColor   hex background for this product's slide; used when image is null
 //                 TIP: once you add a real PNG, extract its dominant color and put it here
 //  • decorations  animated background elements — mix and match:
-//                 'choco-drip' | 'choco-piece' | 'berry' | 'cream-swirl' | 'honey-drop' | 'crumb'
+//                 'choco-drip' | 'choco-piece' | 'berry' | 'cream-swirl'
+//                 | 'honey-drop' | 'crumb' | 'pistachio' | 'caramel'
 // ─────────────────────────────────────────────────────────────────────────────
 
 export type DecorationType =
@@ -20,6 +21,8 @@ export type DecorationType =
   | 'cream-swirl'
   | 'honey-drop'
   | 'crumb'
+  | 'pistachio'
+  | 'caramel'
 
 export interface Dessert {
   name: string
@@ -38,7 +41,43 @@ export const desserts: Dessert[] = [
     description: 'Taste the best chocolate in Lebanon.',
     price: '$3',
     image: 'https://i.imgur.com/57LvFzR.png',
-    themeColor: '#2E0F05',
+    themeColor: '#5C3220',
     decorations: ['choco-drip', 'choco-piece', 'berry'],
+  },
+  {
+    name: 'Strawberry Cake',
+    shortName: 'BERRY',
+    description: 'Soft vanilla sponge with fresh strawberry cream.',
+    price: '$4',
+    image: null,
+    themeColor: '#C75B6E',
+    decorations: ['berry', 'cream-swirl', 'crumb'],
+  },
+  {
+    name: 'Pistachio Slice',
+    shortName: 'PISTACHIO',
+    description: 'Buttery layers with roasted pistachio cream.',
+    price: '$4.5',
+    image: null,
+    themeColor: '#9CAE5A',
+    decorations: ['pistachio', 'cream-swirl', 'crumb'],
+  },
+  {
+    name: 'Honey Cake',
+    shortName: 'HONEY',
+    description: 'Warm honey layers soaked in golden syrup.',
+    price: '$3.5',
+    image: null,
+    themeColor: '#D49A2C',
+    decorations: ['honey-drop', 'cream-swirl', 'caramel'],
+  },
+  {
+    name: 'Lotus Cheesecake',
+    shortName: 'LOTUS',
+    description: 'Creamy cheesecake topped with caramel biscuit crumble.',
+    price: '$5',
+    image: null,
+    themeColor: '#B5763C',
+    decorations: ['caramel', 'choco-piece', 'crumb'],
   },
 ]
