@@ -141,10 +141,34 @@ export default function EditorialGallery() {
           <div className="w-16 h-1 bg-olive-600 rounded-full mx-auto mt-4" />
         </motion.div>
 
-        {/* Editorial grid — 4 columns on desktop, 2 on mobile */}
+        {/* Editorial grid — first block (café + food items, ends with burger) */}
         <div className="grid grid-cols-2 lg:grid-cols-4 auto-rows-[180px] sm:auto-rows-[220px] lg:auto-rows-[260px] gap-4">
-          {GALLERY_IMAGES.map((item, i) => (
+          {GALLERY_IMAGES.slice(0, 5).map((item, i) => (
             <GalleryItem key={i} item={item} index={i} />
+          ))}
+        </div>
+
+        {/* Padel section heading */}
+        <motion.div
+          className="text-center mt-16 sm:mt-20 mb-12 sm:mb-16"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.6, ease: 'easeOut' }}
+        >
+          <p className="text-sm font-semibold text-olive-600 tracking-[0.3em] uppercase mb-3">
+            On the Court
+          </p>
+          <h2 className="text-4xl sm:text-5xl font-bold text-stone-800">
+            Padel
+          </h2>
+          <div className="w-16 h-1 bg-olive-600 rounded-full mx-auto mt-4" />
+        </motion.div>
+
+        {/* Editorial grid — second block (padel courts + atmosphere) */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 auto-rows-[180px] sm:auto-rows-[220px] lg:auto-rows-[260px] gap-4">
+          {GALLERY_IMAGES.slice(5).map((item, i) => (
+            <GalleryItem key={i + 5} item={item} index={i + 5} />
           ))}
         </div>
       </div>
