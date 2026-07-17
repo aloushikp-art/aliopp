@@ -71,32 +71,7 @@ const dissolveVReduced = {
   exit: { opacity: 0, transition: { duration: 0.3 } },
 }
 
-// ─── Dessert image placeholder ─────────────────────────────────────────────────
-function DessertPlaceholder({ size = 160 }: { size?: number }) {
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
-      <svg width={size} height={size * 0.9} viewBox="0 0 180 162" fill="none"
-        style={{ pointerEvents: 'none', userSelect: 'none' }}>
-        <ellipse cx="90" cy="150" rx="80" ry="12" fill="rgba(255,255,255,0.22)" />
-        <rect x="18" y="110" width="144" height="38" rx="10" fill="rgba(255,255,255,0.32)" />
-        <rect x="24" y="116" width="132" height="26" rx="7" fill="rgba(255,255,255,0.18)" />
-        <rect x="30" y="74" width="120" height="38" rx="9" fill="rgba(255,255,255,0.36)" />
-        <rect x="36" y="80" width="108" height="26" rx="6" fill="rgba(255,255,255,0.2)" />
-        <rect x="44" y="42" width="92" height="34" rx="8" fill="rgba(255,255,255,0.4)" />
-        <rect x="50" y="48" width="80" height="22" rx="5" fill="rgba(255,255,255,0.22)" />
-        <path d="M44 42 Q58 22 90 20 Q122 22 136 42" fill="rgba(255,255,255,0.46)" />
-        <rect x="87" y="14" width="6" height="18" rx="3" fill="rgba(255,200,150,0.85)" />
-        <ellipse cx="90" cy="13" rx="4" ry="5" fill="rgba(255,180,60,0.92)" />
-        <ellipse cx="90" cy="11" rx="2" ry="3" fill="rgba(255,240,180,0.95)" />
-        <path d="M60 42 Q55 55 58 74" stroke="rgba(255,255,255,0.4)" strokeWidth="3" strokeLinecap="round" fill="none" />
-        <path d="M110 42 Q118 55 114 74" stroke="rgba(255,255,255,0.35)" strokeWidth="2.5" strokeLinecap="round" fill="none" />
-      </svg>
-      <p style={{ margin: 0, fontSize: 10, letterSpacing: '0.15em', color: 'rgba(74,38,16,0.5)', textTransform: 'uppercase', fontWeight: 700 }}>
-        Image Added Later
-      </p>
-    </div>
-  )
-}
+
 
 // ─── Curved chocolate wave (static organic background shape) ──────────────────
 function ChocoWave({ color, flip, heightPct }: { color: string; flip?: boolean; heightPct: number }) {
@@ -121,7 +96,6 @@ function ProductPanel({ dessert, dir, reducedMotion }: {
   dessert: Dessert; dir: number; reducedMotion: boolean
 }) {
   const variants = reducedMotion ? dissolveVReduced : dissolveV
-  const placeholderSize = typeof window !== 'undefined' ? Math.min(240, Math.max(150, window.innerHeight * 0.34)) : 190
   const dark = shade(dessert.themeColor, -12)
   const light = shade(dessert.themeColor, 64)
 
@@ -173,11 +147,9 @@ function ProductPanel({ dessert, dir, reducedMotion }: {
             color: dessert.themeColor, letterSpacing: '-0.01em',
             lineHeight: 1, whiteSpace: 'nowrap',
           }}>{dessert.price}</div>
-          {dessert.image ? (
+          {dessert.image && (
             <img src={dessert.image} alt={dessert.name} draggable={false}
               style={{ maxWidth: '100%', maxHeight: '100%', width: 'auto', height: 'auto', objectFit: 'contain', filter: 'drop-shadow(0 18px 36px rgba(40,20,8,0.45))', userSelect: 'none', position: 'relative', zIndex: 2 }} />
-          ) : (
-            <div style={{ position: 'relative', zIndex: 2, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><DessertPlaceholder size={placeholderSize} /></div>
           )}
         </div>
 
@@ -311,11 +283,9 @@ function DessertCard({ dessert, dist, cardW, cardH, onClick }: {
       {/* Image area */}
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '26px 22px 14px', position: 'relative' }}>
         <div style={{ position: 'absolute', inset: '18px', borderRadius: '50% 50% 46% 54% / 54% 48% 52% 46%', background: 'radial-gradient(circle at 35% 30%, rgba(255,255,255,0.35) 0%, transparent 60%)', pointerEvents: 'none' }} />
-        {dessert.image ? (
+        {dessert.image && (
           <img src={dessert.image} alt={dessert.name} draggable={false}
             style={{ maxHeight: '100%', maxWidth: '100%', objectFit: 'contain', userSelect: 'none', filter: 'drop-shadow(0 10px 26px rgba(40,20,8,0.4))', position: 'relative', zIndex: 2 }} />
-        ) : (
-          <div style={{ position: 'relative', zIndex: 2 }}><DessertPlaceholder size={Math.min(110, cardW * 0.42)} /></div>
         )}
       </div>
       {/* Info */}
