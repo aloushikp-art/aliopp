@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 
 type SectionId = 'hot' | 'cold' | 'dessert' | 'shisha'
@@ -88,31 +88,14 @@ const SECTIONS: Section[] = [
   },
 ]
 
-export default function Menu({ onBack, onHotDrinks, onColdDrinks, onDesserts }: { onBack?: () => void; onHotDrinks?: () => void; onColdDrinks?: () => void; onDesserts?: () => void }) {
+export default function Menu({ onBack, onHotDrinks, onColdDrinks, onDesserts, onShisha }: { onBack?: () => void; onHotDrinks?: () => void; onColdDrinks?: () => void; onDesserts?: () => void; onShisha?: () => void }) {
   const [hovered, setHovered] = useState<SectionId | null>(null)
-  const sectionRefs = useRef<Record<SectionId, HTMLDivElement | null>>({
-    hot: null, cold: null, dessert: null, shisha: null,
-  })
 
   const scrollToSection = (id: SectionId) => {
-    if (id === 'hot' && onHotDrinks) {
-      onHotDrinks()
-      return
-    }
-    if (id === 'cold' && onColdDrinks) {
-      onColdDrinks()
-      return
-    }
-    if (id === 'dessert' && onDesserts) {
-      onDesserts()
-      return
-    }
-    const el = sectionRefs.current[id]
-    if (el) {
-      const offset = 80
-      const top = el.getBoundingClientRect().top + window.scrollY - offset
-      window.scrollTo({ top, behavior: 'smooth' })
-    }
+    if (id === 'hot' && onHotDrinks)    { onHotDrinks(); return }
+    if (id === 'cold' && onColdDrinks)  { onColdDrinks(); return }
+    if (id === 'dessert' && onDesserts) { onDesserts(); return }
+    if (id === 'shisha' && onShisha)    { onShisha(); return }
   }
 
   return (
@@ -255,90 +238,6 @@ export default function Menu({ onBack, onHotDrinks, onColdDrinks, onDesserts }: 
           ))}
         </div>
 
-        {/* Sections */}
-        <div className="space-y-20">
-          {SECTIONS.map((sec) => (
-            <div key={sec.id} ref={(el) => { sectionRefs.current[sec.id] = el }} id={`menu-${sec.id}`}>
-              {/* Animated section header */}
-              <motion.div
-                initial={{ opacity: 0, x: -30 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true, amount: 0.3 }}
-                transition={{ duration: 0.5, ease: 'easeOut' }}
-                className="flex items-center gap-4 mb-8"
-              >
-                <div
-                  className="flex items-center justify-center"
-                  style={{
-                    width: '56px', height: '56px', borderRadius: '16px',
-                    background: sec.gradient, fontSize: '28px',
-                    boxShadow: `0 4px 16px ${sec.glowColor}`,
-                    border: `2px solid ${sec.border}`,
-                  }}
-                >
-                  {sec.icon}
-                </div>
-                <div>
-                  <h3 className="text-2xl font-bold" style={{ color: sec.textColor }}>{sec.label}</h3>
-                  <motion.div
-                    initial={{ width: 0 }}
-                    whileInView={{ width: '60px' }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6, delay: 0.2, ease: 'easeOut' }}
-                    className="h-1 rounded-full mt-1"
-                    style={{ background: sec.gradient }}
-                  />
-                </div>
-              </motion.div>
-
-              {/* Image placeholder + items grid */}
-              <div className="grid sm:grid-cols-2 gap-6">
-                {/* Image placeholder */}
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true, amount: 0.3 }}
-                  transition={{ duration: 0.4 }}
-                  className="rounded-2xl border-2 border-dashed flex flex-col items-center justify-center gap-2 aspect-[4/3] hover:scale-[1.02] transition-transform duration-300"
-                  style={{ borderColor: `${sec.textColor}40`, background: `${sec.textColor}08` }}
-                >
-                  <div
-                    className="flex items-center justify-center"
-                    style={{
-                      width: '48px', height: '48px', borderRadius: '12px',
-                      background: `${sec.textColor}15`, fontSize: '24px',
-                    }}
-                  >
-                    {sec.icon}
-                  </div>
-                  <p className="text-sm font-medium" style={{ color: `${sec.textColor}99` }}>Add {sec.label} image</p>
-                  <p className="text-xs text-stone-400">Recommended: 600 × 450px</p>
-                </motion.div>
-
-                {/* Items */}
-                <div className="space-y-4">
-                  {sec.items.map((item, i) => (
-                    <motion.div
-                      key={item.name}
-                      initial={{ opacity: 0, y: 20 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true, amount: 0.3 }}
-                      transition={{ duration: 0.3, delay: i * 0.08 }}
-                      className="bg-white rounded-xl p-5 shadow-sm hover:shadow-md transition-all duration-200 border border-stone-100"
-                      style={{ borderLeft: `3px solid ${sec.textColor}` }}
-                    >
-                      <div className="flex justify-between items-start mb-1">
-                        <h4 className="text-base font-semibold text-stone-800">{item.name}</h4>
-                        <span className="text-base font-bold" style={{ color: sec.textColor }}>{item.price}</span>
-                      </div>
-                      <p className="text-sm text-stone-500">{item.desc}</p>
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
       </div>
     </section>
   )
