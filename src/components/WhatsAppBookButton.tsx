@@ -41,7 +41,7 @@ export default function WhatsAppBookButton() {
           alignItems: 'center',
           justifyContent: 'center',
           padding: '16px 18px',
-          background: 'linear-gradient(135deg,#1e6fd9,#0b4ea8)',
+          background: 'linear-gradient(135deg,#facc15,#d97706)',
           color: '#fff',
         }}
       >
