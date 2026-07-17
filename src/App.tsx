@@ -13,14 +13,16 @@ import SiteFooter from './components/SiteFooter';
 import WhatsAppButton from './components/WhatsAppButton';
 import ColdDrinksPage from './components/ColdDrinksPage';
 import DessertsPage from './components/DessertsPage';
+import HotDrinksPage from './components/HotDrinksPage';
 
-type Route = 'home' | 'menu' | 'cold-drinks' | 'desserts';
+type Route = 'home' | 'menu' | 'cold-drinks' | 'desserts' | 'hot-drinks';
 
 function parseRoute(): Route {
   const hash = window.location.hash.replace(/^#/, '');
   if (hash === '/menu') return 'menu';
   if (hash === '/menu/cold-drinks') return 'cold-drinks';
   if (hash === '/menu/desserts') return 'desserts';
+  if (hash === '/menu/hot-drinks') return 'hot-drinks';
   return 'home';
 }
 
@@ -45,6 +47,7 @@ export default function App() {
     if (to === 'menu') window.location.hash = '/menu';
     else if (to === 'cold-drinks') window.location.hash = '/menu/cold-drinks';
     else if (to === 'desserts') window.location.hash = '/menu/desserts';
+    else if (to === 'hot-drinks') window.location.hash = '/menu/hot-drinks';
     else window.location.hash = '/';
   };
 
@@ -78,6 +81,16 @@ export default function App() {
     );
   }
 
+  // Hot Drinks gets a fully isolated full-screen layout — no footer, no background
+  if (route === 'hot-drinks') {
+    return (
+      <>
+        <HotDrinksPage navigate={navigate} />
+        <WhatsAppButton />
+      </>
+    );
+  }
+
   return (
     <>
       {showIntro && <IntroAnimation onComplete={() => setShowIntro(false)} />}
@@ -86,7 +99,7 @@ export default function App() {
         <Navbar navigate={navigate} route={route} />
         <main className="relative z-10">
           {route === 'menu' ? (
-            <Menu onBack={() => navigate('home')} onColdDrinks={() => navigate('cold-drinks')} onDesserts={() => navigate('desserts')} />
+            <Menu onBack={() => navigate('home')} onHotDrinks={() => navigate('hot-drinks')} onColdDrinks={() => navigate('cold-drinks')} onDesserts={() => navigate('desserts')} />
           ) : (
             <>
               <Hero onViewMenu={() => navigate('menu')} />
