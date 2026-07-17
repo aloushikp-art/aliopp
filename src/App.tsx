@@ -12,13 +12,15 @@ import ContactSection from './components/ContactSection';
 import SiteFooter from './components/SiteFooter';
 import WhatsAppButton from './components/WhatsAppButton';
 import ColdDrinksPage from './components/ColdDrinksPage';
+import DessertsPage from './components/DessertsPage';
 
-type Route = 'home' | 'menu' | 'cold-drinks';
+type Route = 'home' | 'menu' | 'cold-drinks' | 'desserts';
 
 function parseRoute(): Route {
   const hash = window.location.hash.replace(/^#/, '');
   if (hash === '/menu') return 'menu';
   if (hash === '/menu/cold-drinks') return 'cold-drinks';
+  if (hash === '/menu/desserts') return 'desserts';
   return 'home';
 }
 
@@ -42,6 +44,7 @@ export default function App() {
     }
     if (to === 'menu') window.location.hash = '/menu';
     else if (to === 'cold-drinks') window.location.hash = '/menu/cold-drinks';
+    else if (to === 'desserts') window.location.hash = '/menu/desserts';
     else window.location.hash = '/';
   };
 
@@ -65,6 +68,16 @@ export default function App() {
     );
   }
 
+  // Desserts gets a fully isolated full-screen layout — no footer, no background
+  if (route === 'desserts') {
+    return (
+      <>
+        <DessertsPage navigate={navigate} />
+        <WhatsAppButton />
+      </>
+    );
+  }
+
   return (
     <>
       {showIntro && <IntroAnimation onComplete={() => setShowIntro(false)} />}
@@ -73,7 +86,7 @@ export default function App() {
         <Navbar navigate={navigate} route={route} />
         <main className="relative z-10">
           {route === 'menu' ? (
-            <Menu onBack={() => navigate('home')} onColdDrinks={() => navigate('cold-drinks')} />
+            <Menu onBack={() => navigate('home')} onColdDrinks={() => navigate('cold-drinks')} onDesserts={() => navigate('desserts')} />
           ) : (
             <>
               <Hero onViewMenu={() => navigate('menu')} />
