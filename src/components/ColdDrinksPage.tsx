@@ -1,14 +1,10 @@
-import {
-  useState, useRef, useEffect, useCallback,
-} from 'react'
-import {
-  motion, AnimatePresence, useMotionValue, animate,
-} from 'framer-motion'
-import { coldDrinks } from '../data/coldDrinks'
+import { useState, useRef, useEffect, useCallback } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { coldDrinks, backgroundImage } from '../data/coldDrinks'
 import OlivaLogo from './OlivaLogo'
 
 type View = 'hero' | 'all'
-type NavRoute = 'home' | 'menu' | 'cold-drinks' | 'desserts'
+type NavRoute = 'home' | 'menu' | 'cold-drinks' | 'desserts' | 'hot-drinks'
 
 const CINEMATIC: [number, number, number, number] = [0.22, 1, 0.36, 1]
 const EXIT_EASE: [number, number, number, number] = [0.4, 0, 0.8, 1]
@@ -16,8 +12,8 @@ const DRAG_THRESHOLD = 48
 const LOCK_MS = 960
 
 function bgWordFontSize(word: string): string {
-  const vw = 86 / (word.length * 0.58)
-  return `min(${vw.toFixed(1)}vw, 360px)`
+  const vw = 80 / (word.length * 0.58)
+  return `min(${vw.toFixed(1)}vw, 280px)`
 }
 
 // ─── Dissolve variants ─────────────────────────────────────────────────────────
@@ -51,26 +47,24 @@ const dissolveVReduced = {
   exit: { opacity: 0, transition: { duration: 0.3 } },
 }
 
-// ─── Cold drink image placeholder ──────────────────────────────────────────────
-function ColdDrinkPlaceholder({ size = 160 }: { size?: number }) {
+// ─── Cold drink placeholder ────────────────────────────────────────────────────
+function ColdDrinkPlaceholder({ size = 150 }: { size?: number }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
       <svg width={size} height={size * 1.3} viewBox="0 0 120 156" fill="none"
         style={{ pointerEvents: 'none', userSelect: 'none' }}>
-        {/* Cup body */}
         <path d="M20 30 L100 30 L92 146 Q90 152 84 152 L36 152 Q30 152 28 146 Z"
-          fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.22)" strokeWidth="1.5" />
-        {/* Liquid */}
+          fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.26)" strokeWidth="1.5" />
         <path d="M24 44 L96 44 L90 140 Q88 146 82 146 L38 146 Q32 146 30 140 Z"
-          fill="rgba(255,255,255,0.08)" />
-        {/* Ice cubes */}
+          fill="rgba(255,255,255,0.07)" />
         <rect x="34" y="56" width="22" height="22" rx="4" fill="rgba(255,255,255,0.18)" transform="rotate(12 45 67)" />
-        <rect x="62" y="64" width="20" height="20" rx="4" fill="rgba(255,255,255,0.15)" transform="rotate(-8 72 74)" />
-        <rect x="44" y="86" width="24" height="24" rx="4" fill="rgba(255,255,255,0.12)" transform="rotate(20 56 98)" />
-        {/* Straw */}
+        <rect x="62" y="64" width="20" height="20" rx="4" fill="rgba(255,255,255,0.14)" transform="rotate(-8 72 74)" />
+        <rect x="44" y="86" width="24" height="24" rx="4" fill="rgba(255,255,255,0.11)" transform="rotate(20 56 98)" />
         <rect x="58" y="8" width="6" height="48" rx="3" fill="rgba(255,255,255,0.3)" transform="rotate(8 61 32)" />
-        {/* Lid */}
         <ellipse cx="60" cy="30" rx="42" ry="5" fill="rgba(255,255,255,0.2)" />
+        <circle cx="22" cy="90" r="2" fill="rgba(255,255,255,0.22)" />
+        <circle cx="98" cy="100" r="1.5" fill="rgba(255,255,255,0.18)" />
+        <circle cx="20" cy="110" r="1.5" fill="rgba(255,255,255,0.16)" />
       </svg>
       <p style={{ margin: 0, fontSize: 10, letterSpacing: '0.15em', color: 'rgba(255,255,255,0.38)', textTransform: 'uppercase', fontWeight: 600 }}>
         Image Soon
@@ -79,40 +73,59 @@ function ColdDrinkPlaceholder({ size = 160 }: { size?: number }) {
   )
 }
 
-// ─── Product panel (one dissolve unit) ───────────────────────────────────────
+// ─── Per-drink content panel (dissolves on change) ────────────────────────────
 function ProductPanel({ drink, dir, reducedMotion }: {
   drink: typeof coldDrinks[number]; dir: number; reducedMotion: boolean
 }) {
   const variants = reducedMotion ? dissolveVReduced : dissolveV
-  const placeholderSize = typeof window !== 'undefined' ? Math.min(180, Math.max(110, window.innerHeight * 0.26)) : 150
+  const placeholderSize = typeof window !== 'undefined'
+    ? Math.min(180, Math.max(100, window.innerHeight * 0.24))
+    : 140
 
   return (
     <motion.div
       key={drink.name} custom={dir} variants={variants}
       initial="enter" animate="center" exit="exit"
-      style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', willChange: 'opacity, transform, filter' }}
+      style={{ position: 'absolute', inset: 0, overflow: 'hidden', willChange: 'opacity, transform, filter' }}
     >
-      {/* Giant background word */}
-      <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none', zIndex: 1 }}>
-        <span style={{ fontSize: bgWordFontSize(drink.shortName), fontWeight: 900, letterSpacing: '-0.04em', lineHeight: 1, color: 'rgba(255,255,255,0.09)', whiteSpace: 'nowrap', userSelect: 'none' }}>
-          {drink.shortName}
-        </span>
+      {/* Giant background word — subtle, inside the glass panel */}
+      <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none', zIndex: 0 }}>
+        <span style={{
+          fontSize: bgWordFontSize(drink.shortName), fontWeight: 900,
+          letterSpacing: '-0.04em', lineHeight: 1,
+          color: 'rgba(255,255,255,0.07)', whiteSpace: 'nowrap', userSelect: 'none',
+        }}>{drink.shortName}</span>
       </div>
 
-      {/* Product grid */}
-      <div className="cdp-hero-grid" style={{ position: 'relative', zIndex: 2, flex: 1, display: 'grid', gridTemplateColumns: 'minmax(0,1fr) minmax(0,1fr)', gap: 'clamp(12px,3vw,48px)', alignItems: 'center', maxWidth: 1180, width: '100%', margin: '0 auto', padding: 'clamp(8px,2vh,20px) clamp(56px,8vw,96px)' }}>
-        {/* Text */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(10px,2vh,20px)' }}>
-          <p style={{ margin: 0, fontSize: 'clamp(9px,1.1vw,12px)', fontWeight: 700, letterSpacing: '0.3em', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase' }}>Cold Drinks</p>
-          <h2 style={{ margin: 0, fontSize: 'clamp(26px,4.2vw,68px)', fontWeight: 800, color: '#fff', letterSpacing: '-0.02em', lineHeight: 1.05 }}>{drink.name}</h2>
-          <p style={{ margin: 0, fontSize: 'clamp(13px,1.3vw,17px)', color: 'rgba(255,255,255,0.62)', lineHeight: 1.6, maxWidth: 340 }}>{drink.description}</p>
-          <p style={{ margin: 0, fontSize: 'clamp(24px,3.2vw,54px)', fontWeight: 800, color: '#fff', letterSpacing: '-0.01em' }}>{drink.price}</p>
+      {/* Two-column grid: text left, image right */}
+      <div className="cdp-grid" style={{
+        position: 'relative', zIndex: 1,
+        height: '100%',
+        display: 'grid',
+        gridTemplateColumns: 'minmax(0,1fr) minmax(0,1fr)',
+        gap: 'clamp(10px,3vw,48px)',
+        alignItems: 'center',
+        padding: 'clamp(18px,3.5vh,44px) clamp(22px,4vw,56px)',
+      }}>
+        {/* Left: text */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(8px,1.6vh,16px)' }}>
+          <p style={{ margin: 0, fontSize: 'clamp(9px,1vw,11px)', fontWeight: 700, letterSpacing: '0.3em', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase' }}>Cold Drinks</p>
+          <h2 style={{ margin: 0, fontSize: 'clamp(24px,3.8vw,60px)', fontWeight: 800, color: '#fff', letterSpacing: '-0.02em', lineHeight: 1.05, textShadow: '0 2px 16px rgba(0,0,0,0.35)' }}>
+            {drink.name}
+          </h2>
+          <p style={{ margin: 0, fontSize: 'clamp(13px,1.2vw,16px)', color: 'rgba(255,255,255,0.72)', lineHeight: 1.6, maxWidth: 320 }}>
+            {drink.description}
+          </p>
+          <p style={{ margin: 0, fontSize: 'clamp(22px,3vw,50px)', fontWeight: 800, color: '#fff', letterSpacing: '-0.01em', textShadow: '0 2px 12px rgba(0,0,0,0.28)' }}>
+            {drink.price}
+          </p>
         </div>
-        {/* Image */}
+
+        {/* Right: image */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           {drink.image ? (
             <img src={drink.image} alt={drink.name} draggable={false}
-              style={{ maxHeight: 'clamp(160px,36vh,400px)', objectFit: 'contain', filter: 'drop-shadow(0 24px 64px rgba(0,0,0,0.45))', userSelect: 'none' }} />
+              style={{ maxHeight: 'clamp(140px,34vh,380px)', objectFit: 'contain', filter: 'drop-shadow(0 24px 64px rgba(0,0,0,0.55))', userSelect: 'none' }} />
           ) : (
             <ColdDrinkPlaceholder size={placeholderSize} />
           )}
@@ -127,21 +140,21 @@ function ArrowBtn({ dir, onClick, disabled }: { dir: 'left' | 'right'; onClick: 
   return (
     <button onClick={onClick} disabled={disabled}
       onPointerDown={e => e.stopPropagation()}
-      aria-label={dir === 'left' ? 'Previous' : 'Next'}
+      aria-label={dir === 'left' ? 'Previous drink' : 'Next drink'}
       style={{
         position: 'absolute', top: '50%', transform: 'translateY(-50%)',
-        [dir === 'left' ? 'left' : 'right']: 'clamp(8px,1.5vw,20px)', zIndex: 20,
-        width: 'clamp(40px,5vw,52px)', height: 'clamp(40px,5vw,52px)', borderRadius: '50%',
-        background: 'rgba(255,255,255,0.14)', backdropFilter: 'blur(6px)',
+        [dir === 'left' ? 'left' : 'right']: 'clamp(6px,1.2vw,16px)', zIndex: 20,
+        width: 'clamp(38px,4.5vw,50px)', height: 'clamp(38px,4.5vw,50px)', borderRadius: '50%',
+        background: 'rgba(255,255,255,0.13)', backdropFilter: 'blur(8px)',
         border: '1px solid rgba(255,255,255,0.22)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        cursor: disabled ? 'default' : 'pointer', opacity: disabled ? 0.38 : 1,
+        cursor: disabled ? 'default' : 'pointer', opacity: disabled ? 0.35 : 1,
         transition: 'background 0.2s, opacity 0.3s', padding: 0,
       }}
-      onMouseOver={e => { if (!disabled) e.currentTarget.style.background = 'rgba(255,255,255,0.28)' }}
-      onMouseOut={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.14)' }}
+      onMouseOver={e => { if (!disabled) e.currentTarget.style.background = 'rgba(255,255,255,0.26)' }}
+      onMouseOut={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.13)' }}
     >
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"
         style={{ transform: dir === 'right' ? 'scaleX(-1)' : 'none' }}>
         <path d="M15 18l-6-6 6-6" />
       </svg>
@@ -161,208 +174,110 @@ function Dots({ total, active, onDot }: { total: number; active: number; onDot: 
   )
 }
 
-// ─── Hero view ────────────────────────────────────────────────────────────────
-function HeroView({
-  idx, dir, locked, reducedMotion,
-  onPrev, onNext, onDot, onShowAll,
-  onPointerDown,
-}: {
-  idx: number; dir: number; locked: boolean; reducedMotion: boolean
-  onPrev: () => void; onNext: () => void; onDot: (i: number) => void; onShowAll: () => void
-  onPointerDown: (e: React.PointerEvent) => void
+// ─── "See All" grid card ──────────────────────────────────────────────────────
+function DrinkGridCard({ drink, isActive, onClick }: {
+  drink: typeof coldDrinks[number]; isActive: boolean; onClick: () => void
 }) {
+  const [hover, setHover] = useState(false)
   return (
-    <motion.div key="hero" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      transition={{ duration: 0.5, ease: CINEMATIC }}
-      style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column' }}
-    >
-      <div style={{ flex: 1, position: 'relative', overflow: 'hidden', touchAction: 'pan-y' }}
-        onPointerDown={onPointerDown}
-      >
-        <AnimatePresence custom={dir} mode="sync">
-          <ProductPanel key={idx} drink={coldDrinks[idx]} dir={dir} reducedMotion={reducedMotion} />
-        </AnimatePresence>
-        <ArrowBtn dir="left" onClick={onPrev} disabled={locked} />
-        <ArrowBtn dir="right" onClick={onNext} disabled={locked} />
-      </div>
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14, paddingBottom: 'clamp(16px,3.5vh,32px)', zIndex: 10 }}>
-        <Dots total={coldDrinks.length} active={idx} onDot={onDot} />
-        <button onClick={onShowAll}
-          style={{ padding: '11px 30px', borderRadius: 999, background: 'rgba(255,255,255,0.13)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.28)', color: '#fff', fontSize: 12, fontWeight: 700, letterSpacing: '0.12em', cursor: 'pointer', transition: 'background 0.22s, transform 0.15s' }}
-          onMouseOver={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.25)')}
-          onMouseOut={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.13)')}
-          onMouseDown={e => (e.currentTarget.style.transform = 'scale(0.97)')}
-          onMouseUp={e => (e.currentTarget.style.transform = 'scale(1)')}
-        >SHOW ALL COLD DRINKS</button>
-      </div>
-    </motion.div>
-  )
-}
-
-// ─── Cold drink card ──────────────────────────────────────────────────────────
-function adjustColor(hex: string, amount: number): string {
-  const n = parseInt(hex.replace('#', ''), 16)
-  const r = Math.min(255, ((n >> 16) & 0xff) + amount)
-  const g = Math.min(255, ((n >> 8) & 0xff) + amount)
-  const b = Math.min(255, (n & 0xff) + amount)
-  return `#${((1 << 24) | (r << 16) | (g << 8) | b).toString(16).slice(1)}`
-}
-
-function DrinkCard({ drink, dist, cardW, cardH, onClick }: {
-  drink: typeof coldDrinks[number]; dist: number; cardW: number; cardH: number; onClick: () => void
-}) {
-  const abs = Math.abs(dist)
-  const isCenter = abs === 0
-  return (
-    <motion.div
-      animate={{ scale: isCenter ? 1 : abs === 1 ? 0.9 : 0.8, opacity: isCenter ? 1 : abs === 1 ? 0.68 : abs === 2 ? 0.3 : 0 }}
-      transition={{ duration: 0.45, ease: CINEMATIC }}
+    <motion.button
       onClick={onClick}
+      whileHover={{ scale: 1.04, y: -3 }}
+      whileTap={{ scale: 0.97 }}
+      transition={{ type: 'spring', stiffness: 360, damping: 18 }}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
       style={{
-        width: cardW, height: cardH, flexShrink: 0,
-        borderRadius: 28,
-        background: `linear-gradient(150deg, ${drink.bgColor}ee 0%, ${adjustColor(drink.bgColor, 30)} 100%)`,
-        border: `1px solid rgba(255,255,255,${isCenter ? 0.22 : 0.1})`,
-        cursor: isCenter ? 'pointer' : 'default',
-        overflow: 'hidden',
-        display: 'flex', flexDirection: 'column',
-        boxShadow: isCenter ? '0 32px 80px rgba(0,0,0,0.45)' : '0 8px 24px rgba(0,0,0,0.2)',
-        filter: abs > 1 ? 'blur(2px)' : 'none',
-        transition: 'box-shadow 0.35s, filter 0.35s',
+        background: hover || isActive ? 'rgba(255,255,255,0.18)' : 'rgba(255,255,255,0.09)',
+        backdropFilter: 'blur(10px)',
+        border: isActive ? '1.5px solid rgba(255,255,255,0.55)' : '1px solid rgba(255,255,255,0.18)',
+        borderRadius: 18,
+        padding: '18px 14px',
+        cursor: 'pointer',
+        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10,
+        textAlign: 'center',
+        transition: 'background 0.18s, border-color 0.18s',
       }}
     >
-      {/* Image area */}
-      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px 20px 12px', background: 'rgba(0,0,0,0.12)' }}>
+      <div style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 80 }}>
         {drink.image ? (
           <img src={drink.image} alt={drink.name} draggable={false}
-            style={{ maxHeight: '100%', maxWidth: '100%', objectFit: 'contain', userSelect: 'none', filter: 'drop-shadow(0 8px 24px rgba(0,0,0,0.4))' }} />
+            style={{ maxHeight: 80, maxWidth: '100%', objectFit: 'contain', filter: 'drop-shadow(0 6px 16px rgba(0,0,0,0.45))', userSelect: 'none' }} />
         ) : (
-          <ColdDrinkPlaceholder size={Math.min(90, cardW * 0.38)} />
+          <ColdDrinkPlaceholder size={54} />
         )}
       </div>
-      {/* Info */}
-      <div style={{ padding: '16px 20px 20px', background: 'rgba(0,0,0,0.18)', borderTop: '1px solid rgba(255,255,255,0.12)' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-          <p style={{ margin: 0, fontSize: 'clamp(14px,1.7vw,18px)', fontWeight: 700, color: '#fff', lineHeight: 1.2 }}>{drink.name}</p>
-          <p style={{ margin: 0, marginLeft: 10, fontSize: 'clamp(14px,1.7vw,18px)', fontWeight: 800, color: '#fff', flexShrink: 0 }}>{drink.price}</p>
-        </div>
-        <p style={{ margin: 0, fontSize: 'clamp(11px,1.1vw,13px)', color: 'rgba(255,255,255,0.6)', lineHeight: 1.45 }}>{drink.description}</p>
+      <div>
+        <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: '#fff', lineHeight: 1.2 }}>{drink.name}</p>
+        <p style={{ margin: '3px 0 0', fontSize: 12, fontWeight: 800, color: 'rgba(255,255,255,0.75)' }}>{drink.price}</p>
       </div>
-    </motion.div>
+    </motion.button>
   )
 }
 
-// ─── All Cold Drinks view (horizontal carousel) ───────────────────────────────
-function AllColdDrinksView({ initialIdx, onSelect, onBack }: {
-  initialIdx: number; onSelect: (i: number) => void; onBack: () => void
+// ─── "See All Cold Drinks" overlay ────────────────────────────────────────────
+function AllColdDrinksOverlay({ activeIdx, onSelect, onClose }: {
+  activeIdx: number; onSelect: (i: number) => void; onClose: () => void
 }) {
-  const [idx, setIdx] = useState(initialIdx)
-  const containerRef = useRef<HTMLDivElement>(null)
-  const [cw, setCw] = useState(0)
-  const [ch, setCh] = useState(0)
-  const trackX = useMotionValue(0)
-  const dragging = useRef(false)
-  const dragStartX = useRef(0)
-  const trackStart = useRef(0)
-
-  useEffect(() => {
-    const el = containerRef.current; if (!el) return
-    const ro = new ResizeObserver(([e]) => { setCw(e.contentRect.width); setCh(e.contentRect.height) })
-    ro.observe(el); return () => ro.disconnect()
-  }, [])
-
-  const FRAC = cw < 640 ? 0.82 : 0.46
-  const GAP = 24
-  const cardW = cw * FRAC
-  const cardH = Math.min(500, Math.max(280, ch * 0.78))
-
-  const getTarget = useCallback((i: number) => !cw ? 0 : cw / 2 - cardW / 2 - i * (cardW + GAP), [cw, cardW])
-
-  useEffect(() => {
-    if (!cw) return
-    const ctrl = animate(trackX, getTarget(idx), { type: 'spring', stiffness: 300, damping: 30, restDelta: 0.5 })
-    return () => ctrl.stop()
-  }, [idx, getTarget])
-
-  const snap = useCallback((i: number) => setIdx(Math.max(0, Math.min(i, coldDrinks.length - 1))), [])
-
-  useEffect(() => {
-    const onMove = (e: PointerEvent) => {
-      if (!dragging.current) return
-      trackX.set(trackStart.current + (e.clientX - dragStartX.current))
-    }
-    const onUp = (e: PointerEvent) => {
-      if (!dragging.current) return; dragging.current = false
-      const diff = e.clientX - dragStartX.current
-      if (Math.abs(diff) > DRAG_THRESHOLD) snap(idx + (diff < 0 ? 1 : -1))
-      else animate(trackX, getTarget(idx), { type: 'spring', stiffness: 300, damping: 30 })
-    }
-    const onCancel = () => { dragging.current = false; animate(trackX, getTarget(idx), { type: 'spring', stiffness: 300, damping: 30 }) }
-    window.addEventListener('pointermove', onMove)
-    window.addEventListener('pointerup', onUp)
-    window.addEventListener('pointercancel', onCancel)
-    return () => {
-      window.removeEventListener('pointermove', onMove)
-      window.removeEventListener('pointerup', onUp)
-      window.removeEventListener('pointercancel', onCancel)
-    }
-  }, [idx, getTarget, snap, trackX])
-
-  const onPD = (e: React.PointerEvent<HTMLDivElement>) => {
-    dragging.current = true; dragStartX.current = e.clientX; trackStart.current = trackX.get()
-  }
-  const onWheel = (e: React.WheelEvent<HTMLDivElement>) => { if (Math.abs(e.deltaX) > Math.abs(e.deltaY) && Math.abs(e.deltaX) > 8) snap(idx + (e.deltaX > 0 ? 1 : -1)) }
-
-  useEffect(() => {
-    const h = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowLeft') setIdx(i => Math.max(0, i - 1))
-      else if (e.key === 'ArrowRight') setIdx(i => Math.min(coldDrinks.length - 1, i + 1))
-    }
-    window.addEventListener('keydown', h); return () => window.removeEventListener('keydown', h)
-  }, [])
-
   return (
-    <motion.div key="all" initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.97 }}
-      transition={{ duration: 0.55, ease: CINEMATIC }}
-      style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '0 0 clamp(16px,3vh,28px)', gap: 'clamp(14px,2.5vh,24px)' }}
+    <motion.div
+      key="cdp-all"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.35, ease: CINEMATIC }}
+      style={{ position: 'absolute', inset: 0, zIndex: 30, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'clamp(12px,2vw,24px)' }}
     >
-      {/* Back button */}
-      <motion.button initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.18, duration: 0.42, ease: CINEMATIC }}
-        onClick={onBack}
-        style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '9px 22px', borderRadius: 999, background: 'rgba(255,255,255,0.13)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.26)', color: '#fff', fontSize: 12, fontWeight: 700, letterSpacing: '0.1em', cursor: 'pointer', transition: 'background 0.2s' }}
-        onMouseOver={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.24)')}
-        onMouseOut={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.13)')}
-      >
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 15l-6-6-6 6" /></svg>
-        BACK TO PRODUCT VIEW
-      </motion.button>
+      {/* Backdrop — click to close */}
+      <div onClick={onClose}
+        style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(5px)' }} />
 
-      {/* Card track */}
-      <div ref={containerRef}
-        style={{ flex: 1, width: '100%', overflow: 'hidden', cursor: 'grab', touchAction: 'pan-y', display: 'flex', alignItems: 'center' }}
-        onPointerDown={onPD} onWheel={onWheel}
+      {/* Modal card */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.96, y: 18 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.96, y: 18 }}
+        transition={{ duration: 0.42, ease: CINEMATIC, delay: 0.05 }}
+        style={{
+          position: 'relative', zIndex: 1,
+          width: 'min(860px, 94vw)',
+          maxHeight: 'calc(100svh - 48px)',
+          background: 'rgba(0,8,20,0.60)',
+          backdropFilter: 'blur(28px) saturate(1.4)',
+          border: '1px solid rgba(255,255,255,0.17)',
+          borderRadius: 'clamp(20px,2.5vw,30px)',
+          padding: 'clamp(18px,3vw,34px)',
+          display: 'flex', flexDirection: 'column', gap: 'clamp(14px,2.5vh,22px)',
+          overflowY: 'auto',
+        }}
       >
-        <motion.div style={{ x: trackX, display: 'flex', gap: GAP, userSelect: 'none' }}>
-          {coldDrinks.map((drink, i) => (
-            <DrinkCard key={drink.name} drink={drink} dist={i - idx} cardW={cardW} cardH={cardH}
-              onClick={() => i === idx ? onSelect(i) : snap(i)} />
-          ))}
-        </motion.div>
-      </div>
-
-      {/* Controls */}
-      <div style={{ display: 'flex', gap: 12 }}>
-        {(['left', 'right'] as const).map(d => (
-          <button key={d} onClick={() => snap(d === 'left' ? idx - 1 : idx + 1)}
-            disabled={d === 'left' ? idx === 0 : idx === coldDrinks.length - 1}
-            style={{ width: 42, height: 42, borderRadius: '50%', border: 'none', background: 'rgba(255,255,255,0.16)', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: (d === 'left' ? idx === 0 : idx === coldDrinks.length - 1) ? 0.35 : 1, transition: 'opacity 0.2s' }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
-              style={{ transform: d === 'right' ? 'scaleX(-1)' : 'none' }}><path d="M15 18l-6-6 6-6" /></svg>
+        {/* Header */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+          <div>
+            <p style={{ margin: 0, fontSize: 10, fontWeight: 700, letterSpacing: '0.3em', color: 'rgba(255,255,255,0.45)', textTransform: 'uppercase' }}>Menu</p>
+            <h3 style={{ margin: '3px 0 0', fontSize: 'clamp(17px,2.2vw,24px)', fontWeight: 800, color: '#fff', letterSpacing: '-0.01em' }}>All Cold Drinks</h3>
+          </div>
+          <button onClick={onClose} aria-label="Close"
+            style={{ width: 36, height: 36, borderRadius: '50%', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, transition: 'background 0.2s' }}
+            onMouseOver={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.2)')}
+            onMouseOut={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.1)')}
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12" /></svg>
           </button>
-        ))}
-      </div>
-      <Dots total={coldDrinks.length} active={idx} onDot={snap} />
+        </div>
+
+        {/* Grid */}
+        <div className="cdp-all-grid" style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(3, 1fr)',
+          gap: 'clamp(8px,1.8vw,16px)',
+        }}>
+          {coldDrinks.map((drink, i) => (
+            <DrinkGridCard key={drink.name} drink={drink} isActive={i === activeIdx}
+              onClick={() => onSelect(i)} />
+          ))}
+        </div>
+      </motion.div>
     </motion.div>
   )
 }
@@ -372,7 +287,6 @@ export default function ColdDrinksPage({ navigate }: { navigate: (to: NavRoute) 
   const [view, setView] = useState<View>('hero')
   const [heroIdx, setHeroIdx] = useState(0)
   const [dir, setDir] = useState(1)
-  const [allInit, setAllInit] = useState(0)
   const [locked, setLocked] = useState(false)
 
   const lockTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -380,7 +294,9 @@ export default function ColdDrinksPage({ navigate }: { navigate: (to: NavRoute) 
   const pStartY = useRef<number | null>(null)
   const isDrag = useRef(false)
   const reducedMotion = useRef(
-    typeof window !== 'undefined' ? window.matchMedia('(prefers-reduced-motion: reduce)').matches : false,
+    typeof window !== 'undefined'
+      ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      : false,
   )
 
   const drink = coldDrinks[heroIdx]
@@ -412,16 +328,20 @@ export default function ColdDrinksPage({ navigate }: { navigate: (to: NavRoute) 
 
   useEffect(() => {
     if (view !== 'hero') return
-    const h = (e: KeyboardEvent) => { if (e.key === 'ArrowLeft') paginate(-1); else if (e.key === 'ArrowRight') paginate(1) }
-    window.addEventListener('keydown', h); return () => window.removeEventListener('keydown', h)
+    const h = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') paginate(-1)
+      else if (e.key === 'ArrowRight') paginate(1)
+    }
+    window.addEventListener('keydown', h)
+    return () => window.removeEventListener('keydown', h)
   }, [view, paginate])
 
-  // Drag via window listeners — no pointer capture, so arrow clicks keep working
   useEffect(() => {
     if (view !== 'hero') return
     const onMove = (e: PointerEvent) => {
       if (pStartX.current === null) return
-      const dx = Math.abs(e.clientX - pStartX.current), dy = Math.abs(e.clientY - (pStartY.current ?? 0))
+      const dx = Math.abs(e.clientX - pStartX.current)
+      const dy = Math.abs(e.clientY - (pStartY.current ?? 0))
       if (dx > dy && dx > 8) isDrag.current = true
     }
     const onUp = (e: PointerEvent) => {
@@ -448,23 +368,46 @@ export default function ColdDrinksPage({ navigate }: { navigate: (to: NavRoute) 
 
   return (
     <div style={{ position: 'fixed', inset: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-      {/* Animated background */}
-      <div style={{ position: 'absolute', inset: 0, zIndex: 0, backgroundColor: drink.bgColor, transition: 'background-color 0.75s cubic-bezier(0.4,0,0.2,1)' }} />
-      {/* Cool center glow */}
-      <div style={{ position: 'absolute', inset: 0, zIndex: 1, pointerEvents: 'none', background: 'radial-gradient(ellipse 60% 50% at 50% 40%, rgba(100,150,255,0.06) 0%, transparent 80%)' }} />
 
-      {/* Nav */}
-      <nav style={{ position: 'relative', zIndex: 10, height: 64, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 clamp(16px,4vw,40px)' }}>
-        <button onClick={() => navigate('home')} style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'none', border: 'none', cursor: 'pointer' }}>
+      {/* ── Background: fixed blurred photo + per-drink tint ─────────────────── */}
+      <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
+        {/* Photo layer — scaled so blurred edges are clipped, never moves */}
+        <div style={{
+          position: 'absolute', inset: '-7%',
+          backgroundImage: `url(${backgroundImage})`,
+          backgroundSize: 'cover', backgroundPosition: 'center',
+          filter: 'blur(20px)',
+        }} />
+        {/* Per-drink tint — CSS transition only, photo stays fixed */}
+        <div style={{
+          position: 'absolute', inset: 0,
+          backgroundColor: drink.themeColor,
+          opacity: 0.6,
+          transition: 'background-color 0.9s cubic-bezier(0.22,1,0.36,1)',
+        }} />
+        {/* Dark vignette for consistent text readability */}
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.30)' }} />
+      </div>
+
+      {/* ── Nav ──────────────────────────────────────────────────────────────── */}
+      <nav style={{
+        position: 'relative', zIndex: 10, height: 64, flexShrink: 0,
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        padding: '0 clamp(16px,4vw,40px)',
+      }}>
+        <button onClick={() => navigate('home')}
+          style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'none', border: 'none', cursor: 'pointer' }}>
           <OlivaLogo size={38} showText={false} />
-          <span style={{ color: '#fff', fontWeight: 800, fontSize: 17, letterSpacing: '0.05em', textShadow: '0 2px 8px rgba(0,0,0,0.28)' }}>OLIVA</span>
+          <span style={{ color: '#fff', fontWeight: 800, fontSize: 17, letterSpacing: '0.05em', textShadow: '0 2px 8px rgba(0,0,0,0.3)' }}>OLIVA</span>
         </button>
+
         <div style={{ display: 'flex', alignItems: 'center', gap: 'clamp(12px,3vw,28px)' }}>
           {(['Home', 'Menu'] as const).map(label => (
-            <button key={label} onClick={() => navigate(label.toLowerCase() as NavRoute)}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.75)', fontSize: 13, fontWeight: 600, letterSpacing: '0.04em', transition: 'color 0.2s' }}
+            <button key={label}
+              onClick={() => navigate(label.toLowerCase() as NavRoute)}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.72)', fontSize: 13, fontWeight: 600, letterSpacing: '0.04em', transition: 'color 0.2s' }}
               onMouseOver={e => (e.currentTarget.style.color = '#fff')}
-              onMouseOut={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.75)')}
+              onMouseOut={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.72)')}
             >{label}</button>
           ))}
           <button onClick={() => navigate('menu')}
@@ -472,34 +415,90 @@ export default function ColdDrinksPage({ navigate }: { navigate: (to: NavRoute) 
             onMouseOver={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.24)')}
             onMouseOut={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.13)')}
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 19l-7-7 7-7" /></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M19 12H5M12 19l-7-7 7-7" />
+            </svg>
             Menu
           </button>
         </div>
       </nav>
 
-      {/* Content */}
-      <div style={{ flex: 1, position: 'relative', zIndex: 2 }}>
-        <AnimatePresence mode="wait">
-          {view === 'hero' ? (
-            <HeroView key="hero" idx={heroIdx} dir={dir} locked={locked} reducedMotion={reducedMotion.current}
-              onPrev={() => paginate(-1)} onNext={() => paginate(1)} onDot={goTo}
-              onShowAll={() => { setAllInit(heroIdx); setView('all') }}
-              onPointerDown={onPD}
-            />
-          ) : (
-            <AllColdDrinksView key="all" initialIdx={allInit}
-              onSelect={(i) => { setHeroIdx(i); setView('hero') }}
-              onBack={() => setView('hero')}
+      {/* ── Main content ─────────────────────────────────────────────────────── */}
+      <div
+        style={{
+          flex: 1, position: 'relative', zIndex: 2,
+          display: 'flex', flexDirection: 'column', alignItems: 'center',
+          padding: 'clamp(10px,2vh,18px) clamp(10px,2.5vw,24px) 0',
+          gap: 'clamp(10px,1.8vh,18px)',
+          overflow: 'hidden',
+        }}
+        onPointerDown={onPD}
+      >
+        {/* Glass panel + arrows wrapper */}
+        <div style={{
+          position: 'relative', width: '100%', maxWidth: 1080,
+          flex: 1, minHeight: 0,
+          display: 'flex', alignItems: 'stretch',
+        }}>
+          {/* Frosted glass panel */}
+          <div style={{
+            flex: 1,
+            background: 'rgba(255,255,255,0.08)',
+            backdropFilter: 'blur(22px) saturate(1.5)',
+            border: '1px solid rgba(255,255,255,0.17)',
+            borderRadius: 'clamp(16px,2.2vw,28px)',
+            boxShadow: '0 32px 80px rgba(0,0,0,0.38), inset 0 1px 0 rgba(255,255,255,0.2)',
+            overflow: 'hidden',
+            position: 'relative',
+          }}>
+            <AnimatePresence custom={dir} mode="sync">
+              <ProductPanel
+                key={heroIdx}
+                drink={coldDrinks[heroIdx]}
+                dir={dir}
+                reducedMotion={reducedMotion.current}
+              />
+            </AnimatePresence>
+          </div>
+
+          {/* Arrows — outside the panel, inside the wrapper */}
+          <ArrowBtn dir="left" onClick={() => paginate(-1)} disabled={locked} />
+          <ArrowBtn dir="right" onClick={() => paginate(1)} disabled={locked} />
+        </div>
+
+        {/* Bottom controls: dots + See All */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, flexShrink: 0, paddingBottom: 'clamp(12px,2.5vh,24px)', zIndex: 10 }}>
+          <Dots total={coldDrinks.length} active={heroIdx} onDot={goTo} />
+          <button
+            onClick={() => setView('all')}
+            style={{ padding: '10px 28px', borderRadius: 999, background: 'rgba(255,255,255,0.12)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.26)', color: '#fff', fontSize: 12, fontWeight: 700, letterSpacing: '0.12em', cursor: 'pointer', transition: 'background 0.2s, transform 0.15s' }}
+            onMouseOver={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.24)')}
+            onMouseOut={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.12)')}
+            onMouseDown={e => (e.currentTarget.style.transform = 'scale(0.97)')}
+            onMouseUp={e => (e.currentTarget.style.transform = 'scale(1)')}
+          >SEE ALL COLD DRINKS</button>
+        </div>
+
+        {/* "See All" overlay — covers entire page including nav */}
+        <AnimatePresence>
+          {view === 'all' && (
+            <AllColdDrinksOverlay
+              activeIdx={heroIdx}
+              onSelect={(i) => { goTo(i); setView('hero') }}
+              onClose={() => setView('hero')}
             />
           )}
         </AnimatePresence>
       </div>
 
       <style>{`
-        @media (max-width: 620px) {
-          .cdp-hero-grid { grid-template-columns: 1fr !important; }
-          .cdp-hero-grid > div:last-child { order: -1; }
+        @media (max-width: 640px) {
+          .cdp-grid { grid-template-columns: 1fr !important; padding: 14px 18px !important; gap: 14px !important; }
+          .cdp-grid > div:last-child { order: -1; }
+          .cdp-all-grid { grid-template-columns: repeat(2, 1fr) !important; }
+        }
+        @media (max-width: 380px) {
+          .cdp-all-grid { grid-template-columns: 1fr !important; }
         }
       `}</style>
     </div>
