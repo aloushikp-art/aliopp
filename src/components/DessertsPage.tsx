@@ -159,6 +159,18 @@ function ProductPanel({ dessert, dir, reducedMotion }: {
         }}>
           {/* Soft inner highlight */}
           <div style={{ position: 'absolute', inset: '12%', borderRadius: '50%', background: 'radial-gradient(circle at 35% 30%, rgba(255,255,255,0.4) 0%, transparent 55%)', pointerEvents: 'none' }} />
+          {/* Price badge — top-right of the dessert image */}
+          <div style={{
+            position: 'absolute', top: '4%', right: '4%', zIndex: 6,
+            padding: 'clamp(7px,1vw,11px) clamp(12px,1.6vw,18px)',
+            borderRadius: 999,
+            background: 'rgba(255,248,236,0.95)',
+            border: `1.5px solid ${rgba(dark, 0.35)}`,
+            boxShadow: '0 8px 22px rgba(60,30,12,0.28)',
+            fontSize: 'clamp(15px,2vw,24px)', fontWeight: 800,
+            color: dessert.themeColor, letterSpacing: '-0.01em',
+            lineHeight: 1, whiteSpace: 'nowrap',
+          }}>{dessert.price}</div>
           {dessert.image ? (
             <img src={dessert.image} alt={dessert.name} draggable={false}
               style={{ maxWidth: '100%', maxHeight: '100%', width: 'auto', height: 'auto', objectFit: 'contain', filter: 'drop-shadow(0 18px 36px rgba(40,20,8,0.45))', userSelect: 'none', position: 'relative', zIndex: 2 }} />
