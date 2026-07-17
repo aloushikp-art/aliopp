@@ -14,9 +14,8 @@ import WhatsAppButton from './components/WhatsAppButton';
 import ColdDrinksPage from './components/ColdDrinksPage';
 import DessertsPage from './components/DessertsPage';
 import HotDrinksPage from './components/HotDrinksPage';
-import ShishaPage from './components/ShishaPage';
 
-type Route = 'home' | 'menu' | 'cold-drinks' | 'desserts' | 'hot-drinks' | 'shisha';
+type Route = 'home' | 'menu' | 'cold-drinks' | 'desserts' | 'hot-drinks';
 
 function parseRoute(): Route {
   const hash = window.location.hash.replace(/^#/, '');
@@ -24,7 +23,6 @@ function parseRoute(): Route {
   if (hash === '/menu/cold-drinks') return 'cold-drinks';
   if (hash === '/menu/desserts') return 'desserts';
   if (hash === '/menu/hot-drinks') return 'hot-drinks';
-  if (hash === '/menu/shisha') return 'shisha';
   return 'home';
 }
 
@@ -50,7 +48,6 @@ export default function App() {
     else if (to === 'cold-drinks') window.location.hash = '/menu/cold-drinks';
     else if (to === 'desserts') window.location.hash = '/menu/desserts';
     else if (to === 'hot-drinks') window.location.hash = '/menu/hot-drinks';
-    else if (to === 'shisha') window.location.hash = '/menu/shisha';
     else window.location.hash = '/';
   };
 
@@ -94,16 +91,6 @@ export default function App() {
     );
   }
 
-  // Shisha gets a fully isolated full-screen layout — no footer, no background
-  if (route === 'shisha') {
-    return (
-      <>
-        <ShishaPage navigate={navigate} />
-        <WhatsAppButton />
-      </>
-    );
-  }
-
   return (
     <>
       {showIntro && <IntroAnimation onComplete={() => setShowIntro(false)} />}
@@ -112,7 +99,7 @@ export default function App() {
         <Navbar navigate={navigate} route={route} />
         <main className="relative z-10">
           {route === 'menu' ? (
-            <Menu onBack={() => navigate('home')} onHotDrinks={() => navigate('hot-drinks')} onColdDrinks={() => navigate('cold-drinks')} onDesserts={() => navigate('desserts')} onShisha={() => navigate('shisha')} />
+            <Menu onBack={() => navigate('home')} onHotDrinks={() => navigate('hot-drinks')} onColdDrinks={() => navigate('cold-drinks')} onDesserts={() => navigate('desserts')} />
           ) : (
             <>
               <Hero onViewMenu={() => navigate('menu')} />

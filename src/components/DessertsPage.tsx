@@ -121,23 +121,27 @@ function ProductPanel({ dessert, dir, reducedMotion }: {
         gap: 'clamp(10px,1.8vh,18px)',
         overflow: 'hidden',
       }}>
-        {/* Rounded product frame — clean, comfortable, clearly visible */}
+        {/* Product frame — oval placeholder when no image; transparent when image provided */}
         <div className="dz-frame" style={{
           position: 'relative', zIndex: 5,
           width: 'min(380px, 64vw)', height: 'min(340px, 42vh)',
           flexShrink: 0,
-          borderRadius: '50% 50% 46% 54% / 54% 48% 52% 46%',
-          background: `radial-gradient(circle at 32% 28%, ${rgba(light, 0.96)} 0%, ${rgba(dessert.themeColor, 0.94)} 60%, ${rgba(dark, 0.97)} 100%)`,
-          boxShadow: `0 40px 90px rgba(60,30,12,0.38), inset 0 8px 30px rgba(255,255,255,0.4), inset 0 -18px 40px rgba(60,30,12,0.28)`,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          border: `1.5px solid rgba(255,255,255,0.45)`,
-          padding: '8%',
+          ...(dessert.image ? {} : {
+            borderRadius: '50% 50% 46% 54% / 54% 48% 52% 46%',
+            background: `radial-gradient(circle at 32% 28%, ${rgba(light, 0.96)} 0%, ${rgba(dessert.themeColor, 0.94)} 60%, ${rgba(dark, 0.97)} 100%)`,
+            boxShadow: `0 40px 90px rgba(60,30,12,0.38), inset 0 8px 30px rgba(255,255,255,0.4), inset 0 -18px 40px rgba(60,30,12,0.28)`,
+            border: `1.5px solid rgba(255,255,255,0.45)`,
+            padding: '8%',
+          }),
         }}>
-          {/* Soft inner highlight */}
-          <div style={{ position: 'absolute', inset: '12%', borderRadius: '50%', background: 'radial-gradient(circle at 35% 30%, rgba(255,255,255,0.4) 0%, transparent 55%)', pointerEvents: 'none' }} />
-          {/* Price badge — top-right of the dessert image */}
+          {/* Inner highlight — only shown without a real image */}
+          {!dessert.image && (
+            <div style={{ position: 'absolute', inset: '12%', borderRadius: '50%', background: 'radial-gradient(circle at 35% 30%, rgba(255,255,255,0.4) 0%, transparent 55%)', pointerEvents: 'none' }} />
+          )}
+          {/* Price badge */}
           <div style={{
-            position: 'absolute', top: '4%', right: '4%', zIndex: 6,
+            position: 'absolute', top: dessert.image ? '-6px' : '4%', right: dessert.image ? '-6px' : '4%', zIndex: 6,
             padding: 'clamp(7px,1vw,11px) clamp(12px,1.6vw,18px)',
             borderRadius: 999,
             background: 'rgba(255,248,236,0.95)',
@@ -149,7 +153,7 @@ function ProductPanel({ dessert, dir, reducedMotion }: {
           }}>{dessert.price}</div>
           {dessert.image && (
             <img src={dessert.image} alt={dessert.name} draggable={false}
-              style={{ maxWidth: '100%', maxHeight: '100%', width: 'auto', height: 'auto', objectFit: 'contain', filter: 'drop-shadow(0 18px 36px rgba(40,20,8,0.45))', userSelect: 'none', position: 'relative', zIndex: 2 }} />
+              style={{ maxWidth: '100%', maxHeight: '100%', width: 'auto', height: 'auto', objectFit: 'contain', filter: 'drop-shadow(0 22px 50px rgba(40,20,8,0.48))', userSelect: 'none', position: 'relative', zIndex: 2 }} />
           )}
         </div>
 
@@ -282,7 +286,7 @@ function DessertCard({ dessert, dist, cardW, cardH, onClick }: {
     >
       {/* Image area */}
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '26px 22px 14px', position: 'relative' }}>
-        <div style={{ position: 'absolute', inset: '18px', borderRadius: '50% 50% 46% 54% / 54% 48% 52% 46%', background: 'radial-gradient(circle at 35% 30%, rgba(255,255,255,0.35) 0%, transparent 60%)', pointerEvents: 'none' }} />
+        {!dessert.image && <div style={{ position: 'absolute', inset: '18px', borderRadius: '50% 50% 46% 54% / 54% 48% 52% 46%', background: 'radial-gradient(circle at 35% 30%, rgba(255,255,255,0.35) 0%, transparent 60%)', pointerEvents: 'none' }} />}
         {dessert.image && (
           <img src={dessert.image} alt={dessert.name} draggable={false}
             style={{ maxHeight: '100%', maxWidth: '100%', objectFit: 'contain', userSelect: 'none', filter: 'drop-shadow(0 10px 26px rgba(40,20,8,0.4))', position: 'relative', zIndex: 2 }} />

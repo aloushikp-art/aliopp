@@ -34,7 +34,7 @@ export const desserts: Dessert[] = [
     shortName: 'BERRY',
     description: 'Soft vanilla sponge with fresh strawberry cream.',
     price: '$4',
-    image: null,
+    image: '/strawberry-cake.png',
     themeColor: '#C75B6E',
   },
   {
